@@ -18,7 +18,7 @@ It is designed as a showcase project for AI Developer roles, demonstrating pract
   - Storage of both raw text and vector embeddings in PostgreSQL with `pgvector`.  
 
 - **Interactive API & UI**  
-  - Backend powered by FastAPI/Flask.  
+  - Backend powered by Flask.  
   - React-based UI for querying and displaying results.  
   - REST endpoints for `/ask`, `/upload`, `/analyze`.  
 
@@ -49,10 +49,10 @@ In addition to core RAG functionality, the project introduces **AI agents** to h
 
 ## 📂 Project Structure
 
-'''
-rag-knowledge-assistant/
+```
+agile-methods-rainbow6/
 │
-├── backend/                # FastAPI or Flask backend
+├── backend/                # Flask backend
 │   ├── api/                # API routes (/ask, /upload, /analyze)
 │   ├── agents/             # Agent logic (analysis_agent, proactive_agent)
 │   ├── db/                 # PostgreSQL + pgvector setup
@@ -66,19 +66,21 @@ rag-knowledge-assistant/
 │
 ├── docker-compose.yml      # Local dev setup (API + DB + worker)
 ├── requirements.txt        # Python dependencies
+├── requirements.in         # Python dependencies
 ├── package.json            # Frontend dependencies
 └── README.md
-'''
+```
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Python (FastAPI or Flask), Celery/Redis for async jobs  
+- **Backend**: Python (Flask), Celery/Redis for async jobs  
 - **Frontend**: React + Axios  
 - **Database**: PostgreSQL with `pgvector` extension  
 - **Vector Search**: pgvector similarity search  
-- **LLM & Embeddings**: OpenAI / HuggingFace models  
+- **LLM & Embeddings**: Gemini 1.5 flash 
+Undecided:
 - **Integrations**: Slack/Teams webhooks for proactive notifications  
 - **Containerization**: Docker & docker-compose  
 
