@@ -9,7 +9,7 @@ def index():
     return "Hello Rainbow 6!"
 
 @app.route("/daniel")
-def index():
+def daniel():
     return "Hello Rainbow 6! This is Daniel"
 
 
