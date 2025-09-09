@@ -8,6 +8,10 @@ app = Flask(__name__)
 def index():
     return "Hello Rainbow 6!"
 
+@app.route("/daniel")
+def daniel():
+    return "Hello Rainbow 6! This is Daniel"
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
