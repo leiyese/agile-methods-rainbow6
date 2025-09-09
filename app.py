@@ -9,8 +9,9 @@ def index():
     return "Hello Rainbow 6!"
 
 @app.route("/daniel")
-def daniel():
-    return "Hello Rainbow 6! This is Daniel"
+name = "Daniel
+        def daniel():
+    return f"Hello Rainbow 6! This is {name}"
 
 
 if __name__ == "__main__":
