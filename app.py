@@ -1,4 +1,4 @@
-from flask import Flask
+from import Flask
 import os
 
 app = Flask(__name__)
@@ -12,6 +12,9 @@ def index():
 def daniel():
     return "Hello Rainbow 6! This is Daniel"
 
+@app.route("/sabrina")
+def sabrina():
+    return "Hello Rainbow 6! This is Sabrina"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
