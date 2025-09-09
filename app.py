@@ -12,6 +12,9 @@ def index():
 def daniel():
     return "Hello Rainbow 6! This is Daniel"
 
+@app.route("/hua")
+def hua():
+    return "Hello Rainbow 6! This is Hua"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
