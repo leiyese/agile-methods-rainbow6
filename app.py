@@ -10,10 +10,9 @@ def index():
 
 
 @app.route("/daniel")
-name = "Daniel
-        def daniel():
+def daniel():
+    name = "Daniel"
     return f"Hello Rainbow 6! This is {name}"
-
 
 
 @app.route("/hua")
