@@ -11,8 +11,8 @@ def index():
 
 @app.route("/daniel")
 def daniel():
-    return "Hello Rainbow 6! This is Daniel"
-
+    name = "Daniel"
+    return f"Hello Rainbow 6! This is {name}"
 
 
 @app.route("/hua")
