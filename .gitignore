@@ -1,31 +1,55 @@
-# ---- Python / Flask ----
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+
+# ---------- Editors / IDE ----------
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ---------- Python / Flask ----------
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 *.pyd
 *.db
-instance/
 *.sqlite3
+instance/
 *.log
 
-# Virtual environments
+# Virtual envs
+.venv/
 venv/
 env/
-.venv/
-.env/
-*.env
 
-# Packaging
+# Packaging / build
 build/
 dist/
 *.egg-info/
+.eggs/
+pip-wheel-metadata/
 
-# ---- React / Node ----
+# Testing / tooling caches
+.pytest_cache/
+.mypy_cache/
+.coverage*
+htmlcov/
+.ipynb_checkpoints
+.cache/
+
+# ---------- Node / React ----------
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
+.eslintcache
 
 # Build output
 /build
@@ -33,19 +57,19 @@ pnpm-debug.log*
 /.parcel-cache
 /.next
 /out
+dist-ssr/
 
-# Environment files
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Local overrides
+*.local
 
-# ---- IDE / Editor ----
-.vscode/
-.idea/
-*.swp
-*.swo
+# ---------- Environment files ----------
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+**/*.env
 
-# ---- OS files ----
-.DS_Store
-Thumbs.db
+# Allow example env files anywhere in the repo
+!**/.env.example
+!**/env.example
