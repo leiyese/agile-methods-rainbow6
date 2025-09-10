@@ -14,6 +14,7 @@ def daniel():
     return "Hello Rainbow 6! This is Daniel"
 
 
+
 @app.route("/hua")
 def hua():
     return "Hello Rainbow 6! This is Hua"
@@ -21,8 +22,8 @@ def hua():
 
 @app.route("/add/<int:a>/<int:b>")
 def add():
-    return f"{a} + {b} = {a + b}"kkkkkkkk
-
+    return f"{a} + {b} = {a + b}"
+  
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
