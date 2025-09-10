@@ -14,7 +14,7 @@ def daniel():
 
 @app.route("/hua")
 def hua():
-    return fel ms
+    return "Hello Rainbow 6! This is Hua"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
