@@ -1,0 +1,23 @@
+services:
+  # Backend service (Flask API) - Using Docker
+  - type: web
+    name: rainbow6-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://your-frontend-name.onrender.com  # Update with your actual frontend URL
+    healthCheckPath: /api/health
+
+  # Frontend service (React app) - Using Docker
+  - type: web
+    name: rainbow6-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://your-backend-name.onrender.com/api  # Update with your actual backend URL
