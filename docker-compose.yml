@@ -7,3 +7,18 @@ services:
       - "5000:5000"
     environment:
       - FLASK_ENV=development
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    command: npm run dev -- --host           
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:5000
+      - CHOKIDAR_USEPOLLING=true             
+      - WATCHPACK_POLLING=true               
+    volumes:
+      - ./frontend:/app                      
+      - /app/node_modules                    
