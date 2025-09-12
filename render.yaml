@@ -5,3 +5,16 @@ services:
     plan: free
     region: frankfurt
     rootDir: backend
+
+  - type: web
+    name: react-frontend
+    env: docker
+    plan: free
+    region: frankfurt
+    rootDir: frontend
+    envVars:
+      - key: VITE_BACKEND_URL
+        fromService:
+          name: flask-backend
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
