@@ -39,3 +39,28 @@
   docker-compose down
   ```
 - You can also pause or delete containers via Docker Desktop (check the containers icon).
+
+#### Q: How does the database work differ from local and production env. Do we need a separate connection string?
+
+**Short answer:** No! The Flask app uses the same code for both environments.
+
+**How it works:**
+```python
+import os
+DATABASE_URL = os.environ.get('DATABASE_URL')
+# Works in both environments!
+```
+
+**Local Development (Docker Compose):**
+- `DATABASE_URL` points to your local PostgreSQL container
+- Example: `postgresql://postgres:pwd@postgres:5432/agile_db`
+- Set via your `.env` file and `docker-compose.yml`
+
+**Production (Render):**
+- `DATABASE_URL` points to Render's managed PostgreSQL database
+- Example: `postgresql://postgres:secure_pass@dpg-xyz.render.com:5432/agile_db`
+- Automatically injected by Render via the `render.yaml` configuration
+
+**Summary:** Same code, different environments! Our Flask app doesn't need to know where it's running.
+
+---
