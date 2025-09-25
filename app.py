@@ -1,29 +1,15 @@
-from flask import Flask
+from flask import Flask, render_template
 import os
+import json
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
+with open("copy.json") as f:
+    copy = json.load(f)
 
 @app.route("/")
 def index():
-    return "Hello Rainbow 6!"
-
-
-@app.route("/daniel")
-def daniel():
-    name = "Daniel"
-    return f"Hello Rainbow 6! This is {name}"
-
-
-@app.route("/hua")
-def hua():
-    return "Hello Rainbow 6! This is Hua"
-
-
-@app.route("/add/<int:a>/<int:b>")
-def add():
-    return f"{a} + {b} = {a + b}"
-  
+    return render_template("index.html", copy=copy)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
