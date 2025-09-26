@@ -218,7 +218,9 @@
         <p class="pitch">{{copy.pitch}}</p>
 
         <div class="actions">
-          <button class="cta">{{copy.cta}}</button>
+          <a href="{{ url_for('under_construction') }}">
+            <button class="cta">{{copy.cta}}</button>
+          </a>
         </div>
       </section>
     </main>
