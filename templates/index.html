@@ -2,20 +2,227 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111827" />
     <title>{{copy.app_name}}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+      :root {
+        --bg: #0b0f19;
+        --fg: #e5e7eb;
+        --muted: #9ca3af;
+        --card: rgba(255, 255, 255, 0.06);
+        --card-border: rgba(255, 255, 255, 0.18);
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        --radius: 16px;
+
+        /* Rainbow palette */
+        --r1: #ff4d4d;  /* red */
+        --r2: #ff922b;  /* orange */
+        --r3: #ffd43b;  /* yellow */
+        --r4: #51cf66;  /* green */
+        --r5: #339af0;  /* blue */
+        --r6: #845ef7;  /* indigo */
+        --r7: #e64980;  /* violet */
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        color: var(--fg);
+        background: var(--bg);
+        font: 500 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
+          Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Animated rainbow background */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: -15% -15% -15% -15%;
+        background: conic-gradient(from 0deg,
+          var(--r1), var(--r2), var(--r3), var(--r4), var(--r5), var(--r6), var(--r7), var(--r1)
+        );
+        filter: blur(60px) saturate(120%);
+        opacity: 0.5;
+        animation: spin 30s linear infinite;
+        z-index: -2;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(1200px 800px at 20% -10%, rgba(255,255,255,0.12), transparent 60%),
+                    radial-gradient(1200px 800px at 100% 0%, rgba(255,255,255,0.08), transparent 60%),
+                    linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.6));
+        z-index: -1;
+      }
+
+      .wrapper {
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 6vw 4vw;
+      }
+
+      .card {
+        width: min(960px, 100%);
+        background: var(--card);
+        backdrop-filter: blur(18px) saturate(120%);
+        -webkit-backdrop-filter: blur(18px) saturate(120%);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(20px, 4vw, 42px);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg);
+        background:
+          linear-gradient(var(--card), var(--card)) padding-box,
+          linear-gradient(90deg, var(--r1), var(--r2), var(--r3), var(--r4), var(--r5), var(--r6), var(--r7)) border-box;
+        border: 1px solid transparent;
+      }
+
+      h1 {
+        margin: 14px 0 8px;
+        font-size: clamp(36px, 6vw, 72px);
+        line-height: 1.05;
+        font-weight: 800;
+        background: linear-gradient(90deg, var(--r1), var(--r2), var(--r3), var(--r4), var(--r5), var(--r6), var(--r7));
+        background-size: 200% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: shift 14s ease-in-out infinite;
+      }
+
+      h2 {
+        margin: 0 0 22px;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: clamp(16px, 2.2vw, 22px);
+      }
+
+      .feature-list {
+        margin: 0 0 20px;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr;
+      }
+
+      .feature-list li {
+        position: relative;
+        padding-left: 28px;
+      }
+      .feature-list li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--r3), var(--r6));
+        box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      }
+
+      .pitch {
+        margin: 8px 0 26px;
+        color: var(--fg);
+        font-size: clamp(15px, 1.8vw, 18px);
+        opacity: 0.95;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .cta {
+        appearance: none;
+        cursor: pointer;
+        border: 0;
+        border-radius: 14px;
+        padding: 14px 22px;
+        font-weight: 700;
+        font-size: 16px;
+        color: #0b0f19;
+        background:
+          linear-gradient(white, white) padding-box,
+          linear-gradient(90deg, var(--r1), var(--r2), var(--r3), var(--r4), var(--r5), var(--r6), var(--r7)) border-box;
+        border: 2px solid transparent;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+        transition: transform 200ms ease, box-shadow 200ms ease, background 400ms ease;
+      }
+      .cta:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+      }
+      .cta:active {
+        transform: translateY(0);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+      }
+
+      .secondary {
+        background:
+          linear-gradient(var(--card), var(--card)) padding-box,
+          linear-gradient(90deg, var(--r5), var(--r6), var(--r7)) border-box;
+        color: var(--fg);
+      }
+
+      @media (min-width: 720px) {
+        .feature-list { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        body::before { animation: none; }
+        h1 { animation: none; }
+        .cta { transition: none; }
+      }
+
+      @keyframes spin { to { transform: rotate(1turn); } }
+      @keyframes shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    </style>
   </head>
   <body>
-    <h1>{{copy.headline}}</h1>
-    <h2>{{copy.subheadline}}</h2>
-    {% for item in copy.bulletpoints %}
-    <li>{{item}}</li>
-    {% endfor %}
-    <p>{{copy.pitch}}</p>
-    <a href="{{ url_for('under_construction') }}">
-      <button>{{copy.cta}}</button>
-    </a>
+    <main class="wrapper" id="main">
+      <section class="card" aria-labelledby="headline">
+        <span class="eyebrow">{{copy.app_name}}</span>
+        <h1 id="headline">{{copy.headline}}</h1>
+        <h2>{{copy.subheadline}}</h2>
 
+        <ul class="feature-list">
+          {% for item in copy.bulletpoints %}
+            <li>{{item}}</li>
+          {% endfor %}
+        </ul>
+
+        <p class="pitch">{{copy.pitch}}</p>
+
+        <div class="actions">
+          <a href="{{ url_for('under_construction') }}">
+            <button class="cta">{{copy.cta}}</button>
+          </a>
+        </div>
+      </section>
+    </main>
   </body>
 </html>
