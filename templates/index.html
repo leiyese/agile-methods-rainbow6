@@ -13,6 +13,9 @@
     <li>{{item}}</li>
     {% endfor %}
     <p>{{copy.pitch}}</p>
-    <button>{{copy.cta}}</button>
+    <a href="{{ url_for('under_construction') }}">
+      <button>{{copy.cta}}</button>
+    </a>
+
   </body>
 </html>

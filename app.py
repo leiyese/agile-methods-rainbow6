@@ -11,6 +11,10 @@ with open("copy.json") as f:
 def index():
     return render_template("index.html", copy=copy)
 
+@app.route("/under-construction")
+def under_construction():
+    return render_template("under_construction.html")
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
