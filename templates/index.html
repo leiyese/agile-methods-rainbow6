@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{copy.app_name}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <h1>{{copy.headline}}</h1>
+    <h2>{{copy.subheadline}}</h2>
+    {% for item in copy.bulletpoints %}
+    <li>{{item}}</li>
+    {% endfor %}
+    <p>{{copy.pitch}}</p>
+    <button>{{copy.cta}}</button>
+  </body>
+</html>
