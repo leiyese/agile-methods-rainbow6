@@ -1,13 +1,14 @@
-from flask import Flask
+from flask import Flask, render_template
 import os
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
+import json
 
 # Create db instance
 db = SQLAlchemy()
 
 #app
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 #database
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///rainbow6.db')
@@ -28,25 +29,16 @@ def db_test():
     except Exception as e:
         return {"error": f"Database connection failed: {str(e)}"}, 500
 
+with open("copy.json") as f:
+    copy = json.load(f)
+
 @app.route("/")
 def index():
-    return "Hello Rainbow 6!"
+    return render_template("index.html", copy=copy)
 
-
-@app.route("/daniel")
-def daniel():
-    name = "Daniel"
-    return f"Hello Rainbow 6! This is {name}"
-
-
-@app.route("/hua")
-def hua():
-    return "Hello Rainbow 6! This is Hua"
-
-
-@app.route("/add/<int:a>/<int:b>")
-def add(a, b):
-    return f"{a} + {b} = {a + b}"
+@app.route("/under-construction")
+def under_construction():
+    return render_template("under_construction.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
