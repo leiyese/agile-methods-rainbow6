@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:5000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
