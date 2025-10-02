@@ -1,0 +1,12 @@
+from flask import Blueprint, current_app, render_template
+
+bp = Blueprint("main", __name__)
+
+@bp.get("/", endpoint="index")
+def index():
+    copy = current_app.config.get("COPY", {})
+    return render_template("index.html", copy=copy)
+
+@bp.get("/under-construction", endpoint="under_construction")
+def under_construction():
+    return render_template("under_construction.html")

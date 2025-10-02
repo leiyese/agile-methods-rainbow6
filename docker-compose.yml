@@ -10,9 +10,11 @@ services:
     volumes:
       - ./backend:/app
       - ./data:/app/data
+      - /app/__pycache__
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
+      - FLASK_DEBUG=1
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/rag_db
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - REDIS_URL=redis://redis:6379/0
@@ -42,6 +44,8 @@ services:
       retries: 5
     networks:
       - rag-network
+    env_file:
+      - .env
 
   redis:
     image: redis:alpine
@@ -57,6 +61,7 @@ services:
     volumes:
       - ./backend:/app
       - ./data:/app/data
+      - /app/__pycache__
     environment:
       - FLASK_APP=app.py
       - FLASK_ENV=development
@@ -73,20 +78,21 @@ services:
     command: python -m backend.cli.build_embeddings
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      target: dev
     ports:
-      - "3000:3000"
+      - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
     environment:
       - NODE_ENV=development
-      - REACT_APP_API_URL=http://localhost:5000
+      - VITE_BACKEND_URL=http://localhost:5000
     depends_on:
       - backend
     networks:
       - rag-network
-    command: npm start
 
 networks:
   rag-network:
