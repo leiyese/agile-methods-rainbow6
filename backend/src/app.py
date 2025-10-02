@@ -1,46 +1,39 @@
-from flask import Flask, render_template
 import os
+import json, os
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
-import json
 
-# Create db instance
+# db-instans
 db = SQLAlchemy()
 
-#app
-app = Flask(__name__, template_folder="templates")
+def create_app():
+    app = Flask(__name__, template_folder="templates")
 
-#database
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///rainbow6.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # Database config
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///rainbow6.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    db.init_app(app)
 
-db.init_app(app)
+        # Ladda copy.json
+    copy_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "copy.json")
+    with open(copy_path, "r", encoding="utf-8") as f:
+        app.config["COPY"] = json.load(f)
 
-with app.app_context():
-    db.create_all()
+    # Blueprints
+    from .controllers.main_controller import bp as main_bp
+    from .controllers.db_controller import bp as db_bp
+    app.register_blueprint(main_bp)
+    app.register_blueprint(db_bp)
 
-# Database test route
-@app.route("/db-test")
-def db_test():
-    try:
-        # Use text() for raw SQL queries
-        db.session.execute(text("SELECT 1"))
-        return {"status": "Database connected successfully!"}
-    except Exception as e:
-        return {"error": f"Database connection failed: {str(e)}"}, 500
+    # Skapa tabeller
+    with app.app_context():
+        db.create_all()
 
-with open("copy.json") as f:
-    copy = json.load(f)
+    return app
 
-@app.route("/")
-def index():
-    return render_template("index.html", copy=copy)
-
-@app.route("/under-construction")
-def under_construction():
-    return render_template("under_construction.html")
-
+# gör att du kan köra "python -m backend.src.app" direkt också
 if __name__ == "__main__":
+    app = create_app()
     port = int(os.environ.get("PORT", 5000))
     debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
     app.run(host="0.0.0.0", port=port, debug=debug_mode)
