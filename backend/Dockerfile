@@ -4,13 +4,11 @@ FROM python:3.11-slim
 # Set work directory
 WORKDIR /app
 
-# Install dependencies
+# Copy requirements first for better caching
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app source
-COPY src/ ./src/ 
-COPY Procfile ./
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
