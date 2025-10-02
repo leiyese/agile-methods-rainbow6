@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/rag_db
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - rag-network
+    command: flask run --host=0.0.0.0
+
+  db:
+    image: ankane/pgvector:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=rag_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rag-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - rag-network
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/rag_db
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - rag-network
+    command: python -m backend.cli.build_embeddings
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+    networks:
+      - rag-network
+    command: npm start
+
+networks:
+  rag-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
