@@ -7,7 +7,7 @@ databases:
 services:
   - type: web
     name: flask-backend
-    env: docker
+    runtime: docker
     plan: free
     region: frankfurt
     rootDir: backend
@@ -24,10 +24,9 @@ services:
 
   - type: web
     name: react-frontend
-    env: static
-    plan: free
+    runtime: static
     rootDir: frontend
-    buildCommand: npm run build
+    buildCommand: npm ci && npm run build
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
