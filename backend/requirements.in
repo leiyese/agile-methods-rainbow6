@@ -2,3 +2,7 @@ flask
 gunicorn
 psycopg2-binary
 flask-sqlalchemy
+google-genai
+faiss-cpu
+tiktoken
+pgvector
