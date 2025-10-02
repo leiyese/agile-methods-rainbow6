@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import "./Chat.css";
+import ChatInput from "./ChatInput";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -30,18 +31,6 @@ export default function Chat() {
       setMessages((prev) => [...prev, data]);
       setIsLoading(false);
     }, 1000);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    handleSendMessage(inputValue);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage(inputValue);
-    }
   };
 
   return (
@@ -89,25 +78,12 @@ export default function Chat() {
 
         <div ref={messagesEndRef} />
       </div>
-
-      <form className="chat-input-container" onSubmit={handleSubmit}>
-        <div className="input-wrapper">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Skriv ditt meddelande här..."
-            disabled={isLoading}
-            className="chat-input"
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !inputValue.trim()}
-            className="send-button"
-          ></button>
-        </div>
-      </form>
+      <ChatInput
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        isLoading={isLoading}
+        onSendMessage={handleSendMessage}
+      />
     </div>
   );
 }
