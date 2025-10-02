@@ -1,14 +1,10 @@
 from flask import Blueprint
 from sqlalchemy import text
-from ..app import db
+from ..extensions import db
 
 bp = Blueprint("db", __name__)
 
-@bp.route("/db-test")
+@bp.get("/db-test")
 def db_test():
-    try:
-        # Use text() for raw SQL queries
-        db.session.execute(text("SELECT 1"))
-        return {"status": "Database connected successfully!"}
-    except Exception as e:
-        return {"error": f"Database connection failed: {str(e)}"}, 500
+    db.session.execute(text("SELECT 1"))
+    return {"status": "Database connected successfully!"}
