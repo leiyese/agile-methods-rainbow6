@@ -16,8 +16,10 @@ def create_app():
 
     from .controllers.main_controller import bp as main_bp
     from .controllers.db_controller import bp as db_bp
+    from .routes.assistant_routes import bp as assistant_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(db_bp)
+    app.register_blueprint(assistant_bp)
 
 
     with app.app_context():
