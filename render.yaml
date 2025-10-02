@@ -16,15 +16,22 @@ services:
         fromDatabase:
           name: agile-postgres
           property: connectionString
+      - key: FRONTEND_URL
+        fromService:
+          name: react-frontend
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
 
   - type: web
     name: react-frontend
-    env: docker
+    env: static
     plan: free
     region: frankfurt
     rootDir: frontend
+    buildCommand: npm run build
+    staticPublishPath: dist
     envVars:
-      - key: VITE_BACKEND_URL
+      - key: VITE_API_URL
         fromService:
           name: flask-backend
           type: web
