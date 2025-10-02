@@ -1,18 +1,41 @@
 import os
 import json
 from flask import Flask
-from .extensions import db
+from .extensions import db, cors
 
 def create_app():
     app = Flask(__name__, template_folder="templates")
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///rainbow6.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    raw_url = os.environ.get("DATABASE_URL")
+    if raw_url and raw_url.startswith("postgres://"):
+        raw_url = raw_url.replace("postgres://", "postgresql://", 1)
+    app.config["SQLALCHEMY_DATABASE_URI"] = raw_url or "sqlite:///rainbow6.db"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config.setdefault("SQLALCHEMY_ENGINE_OPTIONS", {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    })
+
     db.init_app(app)
 
-    copy_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "copy.json")
-    with open(copy_path, "r", encoding="utf-8") as f:
-        app.config["COPY"] = json.load(f)
+    is_prod = os.environ.get("FLASK_ENV") == "production" or os.environ.get("RENDER") == "true"
+    if is_prod:
+        frontend_url = os.environ.get("FRONTEND_URL")
+        if frontend_url:
+            cors.init_app(app, origins=[frontend_url])
+        else:
+            cors.init_app(app, origins=[])
+    else:
+        cors.init_app(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
+
+    try:
+        copy_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "copy.json")
+        with open(copy_path, "r", encoding="utf-8") as f:
+            app.config["COPY"] = json.load(f)
+    except FileNotFoundError:
+        app.config["COPY"] = {}
+    except json.JSONDecodeError:
+        app.config["COPY"] = {}
 
     from .controllers.main_controller import bp as main_bp
     from .controllers.db_controller import bp as db_bp
@@ -21,12 +44,10 @@ def create_app():
     app.register_blueprint(db_bp)
     app.register_blueprint(assistant_bp)
 
-
     with app.app_context():
         db.create_all()
 
     return app
-
 
 if __name__ == "__main__":
     app = create_app()
