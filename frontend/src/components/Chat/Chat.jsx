@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import "./Chat.css";
 import ChatInput from "./ChatInput";
+import { askAssistant } from '../../api/assistantApi';
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -23,14 +24,42 @@ export default function Chat() {
     setInputValue("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      const data = {
-        type: "assistant",
-        content: `Du frågade: "${message}". Detta är ett testsvar från assistenten.`,
+    try {
+      const result = await askAssistant(message, false); // Set to true for mock mode
+      
+      if (result.success) {
+        const assistantMessage = {
+          type: "assistant",
+          content: result.data.answer,
+          metadata: {
+            model: result.data.model_used,
+            latency: result.data.latency_ms,
+            traceId: result.data.trace_id
+          }
+        };
+        
+        setMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        const errorMessage = {
+          type: "assistant",
+          content: `Ursäkta, det uppstod ett fel: ${result.error}`,
+          isError: true
+        };
+        
+        setMessages((prev) => [...prev, errorMessage]);
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      const errorMessage = {
+        type: "assistant", 
+        content: "Ursäkta, något gick fel. Försök igen senare.",
+        isError: true
       };
-      setMessages((prev) => [...prev, data]);
+      
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (
