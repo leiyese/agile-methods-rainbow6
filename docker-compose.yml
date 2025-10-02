@@ -18,12 +18,14 @@ services:
   frontend:
     build:
       context: ./frontend
+      target: dev
     ports:
       - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    command: npm run dev
+    environment:
+      - VITE_HOST=0.0.0.0
 
   postgres:
     image: postgres:15

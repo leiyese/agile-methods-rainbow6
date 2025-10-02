@@ -1,24 +1,22 @@
 # Development stage
 FROM node:20-alpine AS dev
 WORKDIR /app
-COPY package.json package-lock.json* ./
+
+# Copy package files
+COPY package*.json ./
 RUN npm install
+
+# Copy source code
 COPY . .
+
+# Expose port
 EXPOSE 5173
-CMD ["npm", "run", "dev", "--", "--host"]
 
-# Production build stage
-FROM node:20-alpine AS build
-WORKDIR /app
-ARG VITE_BACKEND_URL
-ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
-COPY package.json package-lock.json* ./
-RUN npm install
-COPY . .
-RUN npm run build
+# Run development server
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
-# Production serve stage
+# Production stage (for later use)
 FROM nginx:alpine AS prod
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=dev /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
