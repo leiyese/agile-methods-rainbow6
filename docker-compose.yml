@@ -26,6 +26,7 @@ services:
       - /app/node_modules
     environment:
       - VITE_HOST=0.0.0.0
+      - VITE_API_URL=http://localhost:5000
 
   postgres:
     image: postgres:15
