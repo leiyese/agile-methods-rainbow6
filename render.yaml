@@ -26,7 +26,6 @@ services:
     name: react-frontend
     env: static
     plan: free
-    region: frankfurt
     rootDir: frontend
     buildCommand: npm run build
     staticPublishPath: dist
