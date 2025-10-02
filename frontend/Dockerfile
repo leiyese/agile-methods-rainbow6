@@ -1,5 +1,5 @@
-# Development stage
-FROM node:20-alpine AS dev
+# Build stage
+FROM node:20-alpine AS build
 WORKDIR /app
 
 # Copy package files
@@ -9,14 +9,20 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Expose port
-EXPOSE 5173
+# Build the app
+RUN npm run build
 
-# Run development server
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
-
-# Production stage (for later use)
+# Production stage
 FROM nginx:alpine AS prod
-COPY --from=dev /app/dist /usr/share/nginx/html
+
+# Copy built app to nginx
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration if you have one (optional)
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80
 EXPOSE 80
+
+# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
