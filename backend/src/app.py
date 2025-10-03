@@ -1,7 +1,15 @@
 import os
+import sys
+
+# Add the directory containing this script to sys.path
+# This allows for absolute imports relative to the 'src' directory
+script_dir = os.path.dirname(__file__)
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
+
 import json
 from flask import Flask
-from .extensions import db
+from extensions import db
 
 def create_app():
     app = Flask(__name__, template_folder="templates")
@@ -14,12 +22,16 @@ def create_app():
     with open(copy_path, "r", encoding="utf-8") as f:
         app.config["COPY"] = json.load(f)
 
+
     from .controllers.main_controller import bp as main_bp
     from .controllers.db_controller import bp as db_bp
     from .routes.assistant_routes import bp as assistant_bp
+
     app.register_blueprint(main_bp)
     app.register_blueprint(db_bp)
     app.register_blueprint(assistant_bp)
+
+
 
 
     with app.app_context():
