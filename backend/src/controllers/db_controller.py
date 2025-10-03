@@ -1,6 +1,6 @@
 from flask import Blueprint
 from sqlalchemy import text
-from extensions import db
+from src.extensions import db
 
 bp = Blueprint("db", __name__)
 

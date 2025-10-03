@@ -7,3 +7,4 @@ google-genai
 faiss-cpu
 tiktoken
 pgvector
+python-dotenv
