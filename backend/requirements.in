@@ -1,0 +1,10 @@
+flask
+flask-cors
+gunicorn
+psycopg2-binary
+flask-sqlalchemy
+google-genai
+faiss-cpu
+tiktoken
+pgvector
+python-dotenv
