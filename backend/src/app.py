@@ -10,10 +10,10 @@ if project_base_dir not in sys.path:
 
 import json
 from flask import Flask
-from extensions import db, cors
-from controllers.main_controller import bp as main_bp
-from controllers.db_controller import bp as db_bp
-from routes.assistant_routes import bp as assistant_bp
+from src.extensions import db, cors
+from src.controllers.main_controller import bp as main_bp
+from src.controllers.db_controller import bp as db_bp
+from src.routes.assistant_routes import bp as assistant_bp
 
 # import llm wrapper
 from agents.llm_wrapper import GeminiLLM
