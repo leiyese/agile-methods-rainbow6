@@ -1,0 +1,26 @@
+# Core web framework
+flask
+gunicorn
+
+# Database
+psycopg2-binary
+sqlalchemy
+pgvector
+
+# Document processing
+python-docx
+pyPDF2
+langchain
+
+# Embeddings and LLM
+google-generativeai
+numpy
+
+# Async processing
+celery
+redis
+
+# API and utilities
+flask-cors
+python-dotenv
+requests
