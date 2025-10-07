@@ -2,7 +2,7 @@
 
 **PRIVATE NOTES - DO NOT COMMIT TO GIT**
 
-Last Updated: 2025-10-04
+Last Updated: 2025-10-07
 Developer: Piroz
 Project: Rainbow 6 - Agile Methods Course
 
@@ -159,15 +159,18 @@ This is a **Retrieval-Augmented Generation (RAG)** application for searching off
 3. ✅ Database models and schema
 4. ✅ CLI tools for data processing
 5. ✅ Docker configuration with pgvector
+6. ✅ PDF text extraction and processing
+7. ✅ Section-based chunking for structured documents
+8. ✅ Google API key configuration
 
 ### What's NOT Working Yet:
-1. ❌ Embedding generation (requires Google API key)
+1. ❌ Embedding generation (API quota exceeded)
 2. ❌ Vector similarity search (requires embeddings)
 3. ❌ Database import (requires PostgreSQL running)
-4. ❌ Full RAG pipeline (requires API key + PostgreSQL)
+4. ❌ Full RAG pipeline (requires API quota resolution)
 
 ### Blockers:
-1. **Google API Key**: Needed for embedding generation. Waiting for colleague to provide.
+1. **API Quota Limitation**: Gemini API quota exceeded. Need to wait for reset or upgrade to paid plan.
 2. **Docker Not Installed**: Docker Compose not available on development machine. Need to install or use alternative approach.
 
 ---
@@ -203,11 +206,12 @@ This is a **Retrieval-Augmented Generation (RAG)** application for searching off
 - sqlalchemy==2.0.43
 - psycopg2-binary==2.9.10
 - pgvector==0.2.0
-- google-generativeai==0.3.1
+- google-generativeai==0.8.5  # Updated from 0.3.1
 - python-docx==0.8.11
 - numpy==1.24.3
 - redis==4.5.5
 - celery==5.3.1
+- PyPDF2==3.0.1  # Added for PDF processing
 
 ### Environment Variables (.env)
 
@@ -357,6 +361,16 @@ python -m backend.cli.run_pipeline --skip-word --skip-db --verbose
 
 ### Issue: "Google API key not found"
 **Solution**: Add API key to `.env` file or skip embedding generation with `--skip-embeddings` flag
+
+### Issue: "429 You exceeded your current quota"
+**Solution**: 
+1. Wait for API quota to reset (typically daily)
+2. Upgrade to paid Gemini API plan
+3. Implement local embedding model as fallback
+4. Add retry mechanism with exponential backoff
+
+### Issue: "No module named 'google.genai'"
+**Solution**: Update import to use `import google.generativeai as genai` and install latest version with `pip install -U google-generativeai`
 
 ---
 
@@ -562,6 +576,116 @@ python -m backend.cli.run_pipeline --skip-word --skip-db --verbose
    - Test with real office data
    - Test RAG responses
    - Test error scenarios
+
+---
+
+### Session 3: PDF Processing & RAG Extension (2025-10-07)
+
+#### What Was Done:
+
+1. **Implemented PDF Processing Pipeline**
+   - Created `document_processor.py` for handling various document types
+   - Implemented specialized PDF extraction for insurance documents
+   - Added section-based chunking strategy for structured documents
+   - Created test utilities for PDF extraction and embedding generation
+
+2. **Extended RAG Functionality**
+   - Created `workers/celery_app.py` for asynchronous document processing
+   - Added PDF support to existing RAG pipeline
+   - Updated `llm_wrapper.py` to work with latest Google Generative AI SDK
+   - Implemented robust error handling for API responses
+
+3. **Created CLI Tools for PDF Testing**
+   - Created `extract_pdf.py` for testing PDF extraction
+   - Created `test_pdf_embedding.py` for testing embedding generation
+   - Created `test_gemini_embedding.py` for direct API testing
+
+4. **Tested with Insurance Document**
+   - Successfully extracted text from `/home/piroz/DEV/Agil kursen /rainbow_6/02914-ettsak-villkor-olycksfall-sjuk.pdf`
+   - Identified 13 sections in the document using regex pattern matching
+   - Saved extracted sections to JSON for further processing
+
+5. **Updated Dependencies**
+   - Added PyPDF2 for PDF processing
+   - Reorganized requirements.txt into logical groups
+   - Updated google-generativeai to version 0.8.5
+
+#### Files Created:
+
+- `backend/utils/document_processor.py` - Main document processing module
+- `backend/workers/celery_app.py` - Asynchronous document processing
+- `backend/workers/__init__.py` - Package initialization
+- `backend/cli/process_pdf.py` - CLI tool for PDF processing
+- `backend/cli/extract_pdf.py` - CLI tool for PDF extraction
+- `backend/cli/test_pdf_embedding.py` - CLI tool for embedding testing
+- `backend/cli/test_gemini_embedding.py` - CLI tool for direct API testing
+
+#### Files Modified:
+
+- `backend/agents/llm_wrapper.py` - Updated for latest Google Generative AI SDK
+- `backend/api/upload.py` - Fixed import paths
+- `backend/requirements.txt` - Added PyPDF2 and reorganized
+
+#### Technical Challenges Encountered:
+
+1. **API Version Compatibility**
+   - Problem: Google Generative AI SDK had breaking changes in newer versions
+   - Solution: Updated `llm_wrapper.py` to use the latest API structure
+   - Changes: Updated `embed()` and `generate()` methods to use new API patterns
+
+2. **API Quota Limitations**
+   - Problem: Reached quota limit for Gemini API embedding requests
+   - Error: "429 You exceeded your current quota, please check your plan and billing details"
+   - Impact: Cannot generate new embeddings for search queries
+   - Solution options: Wait for quota reset, upgrade to paid plan, or use local embedding model
+
+3. **PDF Structure Extraction**
+   - Problem: Insurance document has complex structure with sections
+   - Solution: Created regex-based section extractor for structured PDFs
+   - Result: Successfully identified 13 sections in the document
+
+4. **Module Import Issues**
+   - Problem: Import paths not working correctly across modules
+   - Solution: Updated import paths to use absolute imports with `backend.` prefix
+
+#### Current State After Session 3:
+
+**What's Working:**
+1. ✅ PDF text extraction
+2. ✅ Section-based chunking for structured documents
+3. ✅ Document processor integration with existing code
+4. ✅ CLI tools for testing PDF functionality
+5. ✅ Google Generative AI SDK integration (API key configured)
+
+**What's NOT Working:**
+1. ❌ Embedding generation (API quota exceeded)
+2. ❌ Vector search with new PDF content (depends on embeddings)
+
+**Known Issues:**
+1. API quota limit prevents embedding generation
+2. Need to handle API rate limits better in production code
+
+#### Next Steps:
+
+1. **Address API Quota Issue**
+   - Option 1: Wait for quota to reset
+   - Option 2: Upgrade to paid Gemini API plan
+   - Option 3: Implement local embedding model as fallback
+
+2. **Complete PDF Integration**
+   - Test full pipeline once API quota issue is resolved
+   - Implement caching for embeddings to reduce API calls
+   - Add support for more document types (e.g., DOCX, TXT)
+
+3. **Improve Error Handling**
+   - Add better error handling for API quota issues
+   - Implement retry mechanisms with exponential backoff
+   - Add logging for API usage and quota monitoring
+
+4. **Testing & Validation**
+   - Test with different PDF documents
+   - Validate chunking strategy effectiveness
+   - Measure embedding quality and search relevance
 
 ---
 
