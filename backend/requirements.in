@@ -8,3 +8,4 @@ faiss-cpu
 tiktoken
 pgvector
 python-dotenv
+debugpy

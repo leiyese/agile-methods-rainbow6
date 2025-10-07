@@ -4,6 +4,7 @@ services:
       context: ./backend
     ports:
       - "5000:5000"
+      - "5678:5678"  # Port for debugpy
     environment:
       - FLASK_DEBUG=1
       - PYTHONPATH=/app
@@ -11,9 +12,12 @@ services:
     volumes:
       - ./backend:/app
     working_dir: /app
-    command: python -m flask --app src.app:create_app --debug run --host=0.0.0.0 --port=5000
+    #command: python -m flask --app src.app:create_app --debug run --host=0.0.0.0 --port=5000
+    command: python -m debugpy --listen 0.0.0.0:5678 -m flask --app src.app:create_app run --host=0.0.0.0 --port=5000
     depends_on:
       - postgres
+    env_file:
+      - .env
 
   frontend:
     build:
