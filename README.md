@@ -1,112 +1,94 @@
-# RAG Knowledge Assistant for Office Locations
+# RAG Knowledge Assistant with Intelligent Agents
 
-This project is a **Retrieval-Augmented Generation (RAG)** application that connects a **Large Language Model (LLM)** with a **vector database** to enable intelligent search for office locations and services. It is designed to help users find information about physical offices and phone-based services using natural language queries.
+This project is a **Retrieval-Augmented Generation (RAG)** application that connects a **Large Language Model (LLM)** with a **vector database** to enable intelligent document search and analysis.  
+It is designed as a showcase project for AI Developer roles, demonstrating practical skills in **LLM integration, database engineering, and AI agents**.
+
+---
 
 ## 🚀 Features
 
-- **RAG-powered office search**  
-  Search for office locations and phone services using natural language queries. The system retrieves the most relevant offices based on vector similarity and provides context-aware answers.
+- **RAG-powered document search**  
+  Upload company documents (PDF, DOCX, TXT) and query them in natural language.  
+  The system retrieves the most relevant text chunks from the database and augments the LLM with context-aware answers.
 
 - **Document Ingestion Pipeline**  
-  - Automatic text extraction from Word documents
-  - Normalization and validation of data
-  - Embedding generation using Google's embedding model
-  - Storage of both structured data and vector embeddings in PostgreSQL with `pgvector`
+  - Automatic text extraction (PDF, Word, plain text).  
+  - Chunking into manageable segments.  
+  - Embedding generation using an embedding model.  
+  - Storage of both raw text and vector embeddings in PostgreSQL with `pgvector`.  
 
 - **Interactive API & UI**  
-  - Backend powered by Flask
-  - React-based UI for searching offices
-  - REST endpoints for searching offices and services
+  - Backend powered by Flask.  
+  - React-based UI for querying and displaying results.  
+  - REST endpoints for `/ask`, `/upload`, `/analyze`.  
+
+---
+
+## 🧠 Agents (extended development)
+
+In addition to core RAG functionality, the project introduces **AI agents** to handle more complex, real-world scenarios.
+
+### 1. Document Analysis Agent
+- Compares multiple documents and highlights:
+  - Key similarities and differences.  
+  - Conflicting statements or contradictions.  
+  - Recommended actions or clarifications.  
+- Example use case: *"Compare HR Policy 2023 vs. 2024 and highlight conflicts."*  
+- Output: structured report with summaries, conflict list, and recommendations.
+
+### 2. Proactive Agent
+- Runs automatically when new documents are uploaded.  
+- Tasks:
+  - Classifies document type (policy, meeting notes, IT guidelines).  
+  - Generates summaries and extracts action points.  
+  - Performs risk scoring (e.g., GDPR compliance, sensitive data indicators).  
+  - Sends **Slack/Teams notifications** with key insights and links.  
+- Example use case: *Upload a new IT Security Policy → Slack notification with summary + risk flag.*
+
+---
 
 ## 📂 Project Structure
 
 ```
-rag-lf/
-├── backend/
-│   ├── config/        # Configuration and settings
-│   ├── db/            # Database models and connections
-│   ├── ingestion/     # Data extraction and processing
-│   ├── embeddings/    # Vector embedding generation
-│   ├── retriever/     # Search and retrieval functions
-│   ├── schema/        # Database schema documentation
-│   ├── cli/           # Command-line tools
-│   └── api/           # REST API endpoints
-├── frontend/
+agile-methods-rainbow6/
+│
+├── backend/                # Flask backend
+│   ├── api/                # API routes (/ask, /upload, /analyze)
+│   ├── agents/             # Agent logic (analysis_agent, proactive_agent)
+│   ├── db/                 # PostgreSQL + pgvector setup
+│   ├── workers/            # Background jobs (Celery/APScheduler)
+│   └── utils/              # Chunking, embedding, text extraction
+│
+├── frontend/               # React frontend
 │   └── src/
-│       ├── components/ # React components
-│       └── services/   # API clients
-├── data/
-│   ├── raw/           # Raw input data
-│   ├── interim/       # Processed intermediate data
-│   └── processed/     # Final processed data
-└── docker-compose.yml # Docker configuration
+│       ├── components/     # Search UI, results, dashboards
+│       └── services/       # API clients
+│
+├── docker-compose.yml      # Local dev setup (API + DB + worker)
+├── requirements.txt        # Python dependencies
+├── requirements.in         # Python dependencies
+├── package.json            # Frontend dependencies
+└── README.md
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Docker and Docker Compose
-- Google API Key for Gemini (for embeddings generation)
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/leiyese/agile-methods-rainbow6.git
-cd agile-methods-rainbow6
-```
-
-2. Create a `.env` file based on `.env.example`:
-```bash
-cp .env.example .env
-```
-
-3. Add your Google API Key to the `.env` file:
-```
-GOOGLE_API_KEY=your_google_api_key_here
-```
-
-4. Start the application using Docker Compose:
-```bash
-docker-compose up -d
-```
-
-5. Run the RAG pipeline to process the data:
-```bash
-docker-compose exec backend python -m backend.cli.run_pipeline --verbose
-```
-
-6. Access the application:
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
-
-### Using the CLI Tools
-
-The following CLI tools are available for managing the RAG pipeline:
-
-```bash
-# Run the entire pipeline
-docker-compose exec backend python -m backend.cli.run_pipeline --verbose
-
-# Import data and generate embeddings
-docker-compose exec backend python -m backend.cli.import_and_embed
-
-# Test search functionality
-docker-compose exec backend python -m backend.cli.query_demo "Var finns kontoret i Stockholm?"
-```
-
-## 🔍 API Endpoints
-
-- `GET /api/offices/search` - Search for offices using vector similarity
-- `GET /api/offices/hybrid-search` - Search for offices using hybrid search (vector + keyword)
-- `GET /api/offices/llm-search` - Search for offices and format results for LLM
-- `POST /api/ask` - Ask questions about offices and services
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Python, Flask, SQLAlchemy
-- **Database**: PostgreSQL with pgvector extension
-- **Embeddings**: Google Generative AI (Gemini)
-- **Frontend**: React, Axios
-- **Containerization**: Docker, Docker Compose
+- **Backend**: Python (Flask), Celery/Redis for async jobs  
+- **Frontend**: React + Axios  
+- **Database**: PostgreSQL with `pgvector` extension  
+- **Vector Search**: pgvector similarity search  
+- **LLM & Embeddings**: Gemini 1.5 flash 
+Undecided:
+- **Integrations**: Slack/Teams webhooks for proactive notifications  
+- **Containerization**: Docker & docker-compose  
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone and Install
+```bash
+git clone https://github.com/yourusername/rag-knowledge-assistant.git
+cd rag-knowledge-assistant

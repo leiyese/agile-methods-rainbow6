@@ -42,7 +42,7 @@ import logging
 from typing import List, Optional
 
 import numpy as np
-import google.generativeai as genai
+import google.genai as genai
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -91,22 +91,21 @@ class GeminiLLM:
         
         # Configure API key if explicitly provided, or use from environment
         if api_key:
+            genai.configure(api_key=api_key)
             self._api_key = api_key
         else:
-            # Try both environment variable names
-            self._api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API")
+            self._api_key = os.environ.get("GEMINI_API")
         
-        # Configure the API
+        # Create API client with API key
         try:
             if self._api_key:
-                genai.configure(api_key=self._api_key)
+                self.client = genai.Client(api_key=self._api_key)
                 logger.info(f"✓ GeminiLLM initialized (gen: {gen_model}, emb: {emb_model})")
-                self.client = True  # Just a flag to indicate API is configured
             else:
-                logger.warning("⚠ No API key provided. API not initialized.")
+                logger.warning("⚠ No API key provided. Client not initialized.")
                 self.client = None
         except Exception as e:
-            logger.warning(f"⚠ Could not configure Gemini API: {e}")
+            logger.warning(f"⚠ Could not create genai.Client(): {e}")
             self.client = None
 
     def embed(self, texts: List[str]) -> List[np.ndarray]:
@@ -143,43 +142,47 @@ class GeminiLLM:
         """
         if self.client is None:
             raise RuntimeError(
-                "API not configured. Check GOOGLE_API_KEY or GEMINI_API environment variable."
+                "API client unavailable. Check GEMINI_API key and SDK installation."
             )
         
-        # Call the embedding API directly using genai module
+        # Call the embedding API
         try:
-            embeddings = []
-            
-            # Use the embedding function directly
-            for text in texts:
-                # Generate embedding
-                result = genai.embed_content(
-                    model=self.emb_model,
-                    content=text
-                )
-                
-                # Extract embedding values
-                if hasattr(result, "embedding"):
-                    embeddings.append(np.array(result.embedding, dtype=np.float32))
-                else:
-                    # Try alternative attribute names
-                    if hasattr(result, "embeddings"):
-                        embeddings.append(np.array(result.embeddings[0], dtype=np.float32))
-                    elif hasattr(result, "values"):
-                        embeddings.append(np.array(result.values, dtype=np.float32))
-                    else:
-                        # Last resort: try to convert the result directly to numpy array
-                        try:
-                            embeddings.append(np.array(result, dtype=np.float32))
-                        except:
-                            raise RuntimeError(f"Could not extract embedding from response: {result}")
-                
-            logger.debug(f"Generated {len(embeddings)} embeddings")
-            return embeddings
-            
+            resp = self.client.models.embed_content(
+                model=self.emb_model,
+                contents=texts
+            )
         except Exception as e:
             logger.error(f"Embedding API call failed: {e}")
             raise RuntimeError(f"Failed to generate embeddings: {e}")
+        
+        # Parse response - extract embedding values
+        embeddings = []
+        
+        try:
+            if hasattr(resp, "embeddings"):
+                for emb in resp.embeddings:
+                    # Each embedding has a .values attribute containing the vector
+                    if hasattr(emb, 'values'):
+                        embeddings.append(np.array(emb.values, dtype=np.float32))
+                    else:
+                        # Fallback: try to convert directly
+                        embeddings.append(np.array(emb, dtype=np.float32))
+                logger.debug(f"Parsed embeddings via resp.embeddings")
+            else:
+                raise RuntimeError("Response does not have 'embeddings' attribute")
+        except Exception as e:
+            raise RuntimeError(
+                f"Could not parse embedding response. Error: {e}"
+            )
+        
+        # Validate output matches input
+        if len(embeddings) != len(texts):
+            logger.warning(
+                f"⚠ Mismatch: requested {len(texts)} embeddings, got {len(embeddings)}"
+            )
+        
+        logger.debug(f"✓ Generated {len(embeddings)} embeddings")
+        return embeddings
 
     def generate(
         self,
@@ -214,7 +217,12 @@ class GeminiLLM:
             >>> context = "Python was created by Guido van Rossum in 1991."
             >>> question = "Who created Python?"
             >>> 
-            >>> prompt = f'''Context: {context}\n\nBased on the context above, answer this question:\n{question}\n\nAnswer:'''
+            >>> prompt = f'''Context: {context}
+            ... 
+            ... Based on the context above, answer this question:
+            ... {question}
+            ... 
+            ... Answer:'''
             >>> 
             >>> answer = llm.generate(prompt, temperature=0.0)
             >>> print(answer)  # "Guido van Rossum"
@@ -228,59 +236,31 @@ class GeminiLLM:
         """
         if self.client is None:
             raise RuntimeError(
-                "API not configured. Check GOOGLE_API_KEY or GEMINI_API environment variable."
+                "API client unavailable. Check GEMINI_API key and SDK installation."
             )
         
-        # Call the generation API using the direct genai module
+        # Call the generation API using the correct SDK method
         try:
-            # Configure generation parameters
-            generation_config = genai.GenerationConfig(
-                max_output_tokens=max_tokens,
-                temperature=temperature
-            )
-            
-            # Create a model instance
-            model = genai.GenerativeModel(self.gen_model)
-            
-            # Generate response
-            response = model.generate_content(
+            response = self.client.models.generate_content(
+                model=self.gen_model,
                 contents=prompt,
-                generation_config=generation_config
+                config={
+                    'max_output_tokens': max_tokens,
+                    'temperature': temperature
+                }
             )
-            
-            # Extract text
-            if hasattr(response, "text"):
-                text = response.text
-                logger.debug(f"Generated response ({len(text)} chars)")
-                return text
-            else:
-                # Try alternative ways to get text
-                try:
-                    # Try parts[0].text
-                    if hasattr(response, "parts") and len(response.parts) > 0:
-                        if hasattr(response.parts[0], "text"):
-                            text = response.parts[0].text
-                            logger.debug(f"Generated response via parts[0].text ({len(text)} chars)")
-                            return text
-                    
-                    # Try candidates[0].content.parts[0].text
-                    if hasattr(response, "candidates") and len(response.candidates) > 0:
-                        candidate = response.candidates[0]
-                        if hasattr(candidate, "content") and hasattr(candidate.content, "parts") and len(candidate.content.parts) > 0:
-                            text = candidate.content.parts[0].text
-                            logger.debug(f"Generated response via candidates[0] ({len(text)} chars)")
-                            return text
-                    
-                    # Last resort: convert to string
-                    text = str(response)
-                    logger.debug(f"Generated response via str() ({len(text)} chars)")
-                    return text
-                except:
-                    raise RuntimeError(f"Could not extract text from response: {response}")
-                
         except Exception as e:
             logger.error(f"Generation API call failed: {e}")
             raise RuntimeError(f"Failed to generate text: {e}")
+        
+        # Parse response and extract text
+        try:
+            text = response.text
+            logger.debug(f"✓ Generated response ({len(text)} chars)")
+            return text
+        except Exception as e:
+            logger.error(f"Failed to extract text from response: {e}")
+            raise RuntimeError(f"Failed to parse response: {e}")
 
 
 # Quick test function

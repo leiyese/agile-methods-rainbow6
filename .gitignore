@@ -1,81 +1,51 @@
-# Python
+# ---- Python / Flask ----
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-pip-log.txt
-pip-delete-this-directory.txt
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+*.db
 instance/
-.webassets-cache
-.python-version
-celerybeat-schedule
+*.sqlite3
+*.log
 
-# Node.js
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-.pnp/
-.pnp.js
-coverage/
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+*.env
+
+# Packaging
 build/
-.DS_Store
+dist/
+*.egg-info/
+
+# ---- React / Node ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build output
+/build
+/dist
+/.parcel-cache
+/.next
+/out
+
+# Environment files
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Environment variables
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# IDE
-.idea/
+# ---- IDE / Editor ----
 .vscode/
+.idea/
 *.swp
 *.swo
 
-# Project specific
-uploads/
-.pgdata/
-postgres_data/
-
-# Logs
-logs/
-*.log
-
-# Docker
-.dockerignore
+# ---- OS files ----
+.DS_Store
+Thumbs.db
