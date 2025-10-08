@@ -2,8 +2,9 @@
 Database utility functions for PDF Vector RAG System
 """
 
+import json
 import psycopg2
-from psycopg2.extras import RealDictCursor
+from psycopg2.extras import RealDictCursor, Json
 from pgvector.psycopg2 import register_vector
 from contextlib import contextmanager
 from database.config import DB_CONFIG
@@ -99,17 +100,47 @@ def insert_document(filename, file_path, file_size, total_pages, metadata=None):
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor()
+            # Convert metadata dict to JSON if provided
+            metadata_json = Json(metadata) if metadata else None
             cursor.execute("""
                 INSERT INTO documents (filename, file_path, file_size, total_pages, metadata, status)
                 VALUES (%s, %s, %s, %s, %s, 'pending')
                 RETURNING id;
-            """, (filename, file_path, file_size, total_pages, metadata))
+            """, (filename, file_path, file_size, total_pages, metadata_json))
             document_id = cursor.fetchone()[0]
             conn.commit()
             return document_id
     except psycopg2.IntegrityError:
-        print(f"Document with filename '{filename}' already exists")
-        return None
+        # Document already exists - delete existing chunks and update the document
+        print(f"Document with filename '{filename}' already exists - updating existing record...")
+        try:
+            with get_db_connection() as conn:
+                cursor = conn.cursor()
+                # Get existing document ID
+                cursor.execute("SELECT id FROM documents WHERE filename = %s;", (filename,))
+                existing_id = cursor.fetchone()[0]
+                
+                # Delete existing chunks
+                cursor.execute("DELETE FROM document_chunks WHERE document_id = %s;", (existing_id,))
+                deleted_count = cursor.rowcount
+                if deleted_count > 0:
+                    print(f"  Deleted {deleted_count} existing chunks")
+                
+                # Update document metadata
+                metadata_json = Json(metadata) if metadata else None
+                cursor.execute("""
+                    UPDATE documents 
+                    SET file_path = %s, file_size = %s, total_pages = %s, 
+                        metadata = %s, status = 'pending', processed_date = NULL
+                    WHERE id = %s;
+                """, (file_path, file_size, total_pages, metadata_json, existing_id))
+                
+                conn.commit()
+                print(f"  Using existing document ID: {existing_id}")
+                return existing_id
+        except Exception as e:
+            print(f"Error updating existing document: {e}")
+            return None
     except Exception as e:
         print(f"Error inserting document: {e}")
         return None
