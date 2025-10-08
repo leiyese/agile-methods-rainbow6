@@ -1,19 +1,25 @@
+# Web Framework
 flask
 flask-cors
 gunicorn
-psycopg2-binary
 flask-sqlalchemy
-google-genai
-faiss-cpu
-tiktoken
-pgvector
-python-dotenv
-debugpy
 
-# PDF and RAG dependencies
-pypdf2
+# Database
+psycopg2-binary
+pgvector
+
+# AI/LLM
+google-genai
 sentence-transformers
+tiktoken
+
+# PDF Processing
+pypdf2
 langchain
 langchain-community
 langchain-google-genai
+
+# Utilities
+python-dotenv
 numpy
+debugpy
