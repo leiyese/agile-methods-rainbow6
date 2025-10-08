@@ -20,8 +20,8 @@ DB_CONFIG = {
 DATABASE_URL = f"postgresql://{DB_CONFIG['user']}:{DB_CONFIG['password']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
 
 # Embedding model configuration
-# Using Gemini's text-embedding-004 model
-EMBEDDING_MODEL = "models/text-embedding-004"
+# Using Gemini's embedding-001 model
+EMBEDDING_MODEL = "models/embedding-001"
 EMBEDDING_DIMENSION = 768  # Gemini embeddings are 768-dimensional
 
 # Chunking configuration

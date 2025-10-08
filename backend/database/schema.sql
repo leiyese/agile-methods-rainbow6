@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS document_chunks (
     chunk_index INTEGER NOT NULL, -- Order of chunk in document
     page_number INTEGER, -- Source page number
     content TEXT NOT NULL, -- The actual text content
-    embedding vector(768), -- Vector embedding (768 dimensions for Gemini text-embedding-004)
+    embedding vector(768), -- Vector embedding (768 dimensions for Gemini models/embedding-001)
     token_count INTEGER, -- Number of tokens in chunk
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(document_id, chunk_index)
@@ -122,5 +122,5 @@ $$;
 -- Add comments for documentation
 COMMENT ON TABLE documents IS 'Stores metadata for uploaded PDF documents';
 COMMENT ON TABLE document_chunks IS 'Stores text chunks extracted from PDFs with their vector embeddings';
-COMMENT ON COLUMN document_chunks.embedding IS 'Vector embedding of the text chunk (768 dimensions for Gemini text-embedding-004)';
+COMMENT ON COLUMN document_chunks.embedding IS 'Vector embedding of the text chunk (768 dimensions for Gemini models/embedding-001)';
 COMMENT ON FUNCTION search_similar_chunks IS 'Search for semantically similar text chunks using cosine similarity';
