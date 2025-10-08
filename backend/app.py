@@ -10,7 +10,7 @@ load_dotenv()
 from api.ask import ask_blueprint
 from api.upload import upload_blueprint
 from api.analyze import analyze_blueprint
-from api.offices import offices_blueprint
+from api.rag_api import rag_blueprint  # RAG-API för vektorsökning
 
 # Create Flask app
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
@@ -20,7 +20,7 @@ CORS(app)
 app.register_blueprint(ask_blueprint, url_prefix='/api')
 app.register_blueprint(upload_blueprint, url_prefix='/api')
 app.register_blueprint(analyze_blueprint, url_prefix='/api')
-app.register_blueprint(offices_blueprint, url_prefix='/api')
+app.register_blueprint(rag_blueprint)  # RAG-API för vektorsökning
 
 # Root route
 @app.route("/")
