@@ -20,8 +20,8 @@ from typing import List, Dict, Tuple
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from agents.llm_wrapper import GeminiLLM
-from agents.local_embeddings import LocalLLM
+from .llm_wrapper import GeminiLLM
+from .local_embeddings import LocalLLM
 from database.config import CHUNK_SIZE, CHUNK_OVERLAP, EMBEDDING_DIMENSION
 from database.utils import (
     insert_document,
