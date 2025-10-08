@@ -73,7 +73,7 @@ class GeminiLLM:
     def __init__(
         self,
         gen_model: str = "models/gemini-2.0-flash",
-        emb_model: str = "models/text-embedding-004",
+        emb_model: str = "models/embedding-001",
         api_key: Optional[str] = None
     ):
         """Initialize the Gemini LLM wrapper.
