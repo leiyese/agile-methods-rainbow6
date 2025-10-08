@@ -312,3 +312,23 @@ def quick_test():
 
 if __name__ == "__main__":
     quick_test()
+
+
+def generate_response(prompt: str, max_tokens: int = 800, temperature: float = 0.0) -> str:
+    """
+    Enkel wrapper-funktion för att generera svar med Gemini
+    
+    Args:
+        prompt: Frågan eller prompten
+        max_tokens: Maximal längd på svaret
+        temperature: Kreativitet (0.0-1.0)
+        
+    Returns:
+        Genererat svar som sträng
+    """
+    try:
+        llm = GeminiLLM()
+        return llm.generate(prompt, max_tokens=max_tokens, temperature=temperature)
+    except Exception as e:
+        logger.error(f"Failed to generate response: {e}")
+        return f"Det uppstod ett fel vid generering av svar: {e}"

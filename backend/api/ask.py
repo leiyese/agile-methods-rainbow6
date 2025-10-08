@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from db.vector_store import get_relevant_chunks
+from backend.db.connection import SessionLocal
+from backend.retriever.rag_search import search_rag
 import google.generativeai as genai
 import os
 
@@ -21,14 +22,20 @@ def ask():
         
         query = data['query']
         
-        # Get relevant chunks from vector database
-        relevant_chunks = get_relevant_chunks(query)
+        # Skapa databassession
+        db = SessionLocal()
         
-        if not relevant_chunks:
-            return jsonify({
-                "answer": "I couldn't find any relevant information in the documents.",
-                "sources": []
-            }), 200
+        try:
+            # Get relevant chunks from RAG database
+            relevant_chunks = search_rag(db, query, limit=5)
+            
+            if not relevant_chunks:
+                return jsonify({
+                    "answer": "Jag kunde inte hitta någon relevant information i dokumenten.",
+                    "sources": []
+                }), 200
+        finally:
+            db.close()
         
         # Prepare context for LLM
         context = "\n\n".join([chunk["content"] for chunk in relevant_chunks])
@@ -56,6 +63,13 @@ def ask():
                         "source": chunk["metadata"]["source"],
                         "title": chunk["metadata"].get("title", "Unknown")
                     })
+            # Om det inte finns source i metadata, använd source_id
+            elif chunk["source_id"] not in [s.get("source", "") for s in sources]:
+                sources.append({
+                    "source": chunk["source_id"],
+                    "type": chunk["source_type"],
+                    "similarity": chunk["similarity_score"]
+                })
         
         return jsonify({
             "answer": response.text,

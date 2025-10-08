@@ -7,10 +7,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import API routes
-from api.ask import ask_blueprint
-from api.upload import upload_blueprint
-from api.analyze import analyze_blueprint
-from api.rag_api import rag_blueprint  # RAG-API för vektorsökning
+from backend.api.ask import ask_blueprint
+from backend.api.upload import upload_blueprint
+from backend.api.analyze import analyze_blueprint
+from backend.api.rag_api import rag_blueprint  # RAG-API för vektorsökning
 
 # Create Flask app
 app = Flask(__name__, template_folder="../templates", static_folder="../static")
@@ -25,11 +25,23 @@ app.register_blueprint(rag_blueprint)  # RAG-API för vektorsökning
 # Root route
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return jsonify({
+        "status": "ok",
+        "message": "RAG API is running",
+        "endpoints": [
+            "/api/rag/search",
+            "/api/rag/hybrid-search",
+            "/api/rag/ask",
+            "/api/rag/add"
+        ]
+    })
 
 @app.route("/under-construction")
 def under_construction():
-    return render_template("under_construction.html")
+    return jsonify({
+        "status": "under_construction",
+        "message": "This endpoint is under construction"
+    })
 
 # Health check endpoint
 @app.route("/health")

@@ -1,34 +1,69 @@
 from flask import Blueprint, request, jsonify
-from agents.analysis_agent import analyze_documents
-from agents.proactive_agent import process_new_document
+from backend.db.connection import SessionLocal
+from backend.retriever.rag_search import search_rag
+from backend.agents.llm_wrapper import generate_response
 
 analyze_blueprint = Blueprint('analyze', __name__)
 
 @analyze_blueprint.route('/analyze', methods=['POST'])
 def analyze():
     """
-    Endpoint to analyze and compare documents
+    Endpoint to analyze and compare documents using RAG model
     """
     try:
         data = request.get_json()
         
-        if not data or 'document_ids' not in data:
-            return jsonify({"error": "Document IDs are required"}), 400
-            
-        document_ids = data['document_ids']
+        if not data or 'query' not in data:
+            return jsonify({"error": "Query is required"}), 400
         
-        if not isinstance(document_ids, list) or len(document_ids) < 1:
-            return jsonify({"error": "At least one document ID is required"}), 400
-            
-        # If comparing multiple documents
-        if len(document_ids) > 1:
-            analysis_result = analyze_documents(document_ids)
-            return jsonify(analysis_result), 200
+        query = data['query']
+        source_type = data.get('source_type')
         
-        # If analyzing a single document
-        else:
-            analysis_result = process_new_document(document_ids[0])
-            return jsonify(analysis_result), 200
+        # Skapa databassession
+        db = SessionLocal()
+        
+        try:
+            # Sök efter relevanta dokument med RAG
+            results = search_rag(db, query, limit=5, source_type=source_type)
+            
+            if not results:
+                return jsonify({
+                    "analysis": "Inga relevanta dokument hittades för din fråga.",
+                    "sources": []
+                }), 200
+                
+            # Bygg kontext från resultat
+            context = "\n\n".join([result['content'] for result in results])
+            
+            # Skapa analys med LLM
+            prompt = f"""
+            Analysera följande information och sammanfatta de viktigaste punkterna.
+            
+            INFORMATION:
+            {context}
+            
+            FRÅGA:
+            {query}
+            
+            Ge en strukturerad analys med de viktigaste insikterna.
+            """
+            
+            analysis = generate_response(prompt)
+            
+            # Formatera källor
+            sources = [{
+                "source_id": result['source_id'],
+                "source_type": result['source_type'],
+                "similarity": result['similarity_score'],
+                "content_preview": result['content'][:200] + "..." if len(result['content']) > 200 else result['content']
+            } for result in results]
+            
+            return jsonify({
+                "analysis": analysis,
+                "sources": sources
+            }), 200
+        finally:
+            db.close()
             
     except Exception as e:
         return jsonify({"error": str(e)}), 500
