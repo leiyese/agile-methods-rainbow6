@@ -9,3 +9,11 @@ tiktoken
 pgvector
 python-dotenv
 debugpy
+
+# PDF and RAG dependencies
+pypdf2
+sentence-transformers
+langchain
+langchain-community
+langchain-google-genai
+numpy
