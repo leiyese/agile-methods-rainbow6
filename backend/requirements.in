@@ -1,10 +1,22 @@
+# Web framework
 flask
 flask-cors
-gunicorn
-psycopg2-binary
 flask-sqlalchemy
-google-genai
+
+# Production server
+gunicorn
+
+# Database
+psycopg2-binary
+pgvector
+
+# AI and machine learning
+google-generativeai
 faiss-cpu
 tiktoken
-pgvector
+
+# Environment
 python-dotenv
+
+# Development/debugging
+debugpy

@@ -39,14 +39,6 @@ def answer():
             200,
         )
 
-    # return jsonify({
-    #     "answer": f"Jag kan inte svara på: {question}",
-    #     "model_used": "primary",
-    #     "latency_ms": int((time.time() - t0) * 1000),
-    #     "trace_id": trace_id
-    # }), 200
-
-    # Instead of lines 32-37, do something like:
     try:
         llm = current_app.config.get("LLM")
         if not llm or not llm.client:

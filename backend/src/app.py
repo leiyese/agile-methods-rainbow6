@@ -11,9 +11,8 @@ if project_base_dir not in sys.path:
 import json
 from flask import Flask
 from src.extensions import db, cors
-from src.controllers.main_controller import bp as main_bp
-from src.controllers.db_controller import bp as db_bp
-from src.routes.assistant_routes import bp as assistant_bp
+from src.blueprints.main import bp as main_bp
+from src.blueprints.assistant import bp as assistant_bp
 
 # import llm wrapper
 from agents.llm_wrapper import GeminiLLM
@@ -67,10 +66,10 @@ def create_app():
 
 
     app.register_blueprint(main_bp)
-    app.register_blueprint(db_bp)
     app.register_blueprint(assistant_bp)
 
     with app.app_context():
+
         db.create_all()
 
     return app
