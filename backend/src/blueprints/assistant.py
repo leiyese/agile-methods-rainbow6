@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, current_app
 import time, uuid
 
+from agents.rag_query import create_rag_engine
+
 bp = Blueprint("assistant", __name__, url_prefix="/api")
 
 
@@ -13,6 +15,7 @@ def answer():
 
     question = data.get("question")
     use_mock = bool(data.get("use_mock", False))
+    use_rag = bool(data.get("use_rag", True))  # Default to using RAG
 
     if not question:
         return (
@@ -34,6 +37,7 @@ def answer():
                     "model_used": "mock",
                     "latency_ms": int((time.time() - t0) * 1000),
                     "trace_id": trace_id,
+                    "sources": []
                 }
             ),
             200,
@@ -52,24 +56,59 @@ def answer():
                 503,
             )
 
-        # Generate answer using LLM
-        answer = llm.generate(
-            prompt=question,
-            max_tokens=400,
-            temperature=0.7,  # Adjust based on desired creativity
-        )
+        if use_rag:
+            # Use RAG query engine for context-aware answers
+            current_app.logger.info(f"Using RAG for question: {question}")
+            
+            # Create RAG engine with the app's LLM
+            rag_engine = create_rag_engine(llm=llm)
+            
+            # Process query through RAG pipeline
+            result = rag_engine.query(question)
+            
+            if result["success"]:
+                return (
+                    jsonify(
+                        {
+                            "answer": result["answer"],
+                            "model_used": f"{llm.gen_model} with RAG",
+                            "latency_ms": int((time.time() - t0) * 1000),
+                            "trace_id": trace_id,
+                            "sources": result["sources"]
+                        }
+                    ),
+                    200,
+                )
+            else:
+                return (
+                    jsonify(
+                        {
+                            "error": "RAGQueryFailed",
+                            "message": result["answer"],
+                        }
+                    ),
+                    500,
+                )
+        else:
+            # Generate answer using LLM directly (no RAG)
+            answer = llm.generate(
+                prompt=question,
+                max_tokens=400,
+                temperature=0.7,
+            )
 
-        return (
-            jsonify(
-                {
-                    "answer": answer,
-                    "model_used": llm.gen_model,
-                    "latency_ms": int((time.time() - t0) * 1000),
-                    "trace_id": trace_id,
-                }
-            ),
-            200,
-        )
+            return (
+                jsonify(
+                    {
+                        "answer": answer,
+                        "model_used": llm.gen_model,
+                        "latency_ms": int((time.time() - t0) * 1000),
+                        "trace_id": trace_id,
+                        "sources": []
+                    }
+                ),
+                200,
+            )
 
     except Exception as e:
         current_app.logger.error(f"LLM generation failed: {e}")
@@ -77,7 +116,7 @@ def answer():
             jsonify(
                 {
                     "error": "InternalServerError",
-                    "message": "Failed to generate response",
+                    "message": f"Failed to generate response: {str(e)}",
                 }
             ),
             500,

@@ -9,9 +9,9 @@ load_dotenv()
 
 # PostgreSQL connection parameters
 DB_CONFIG = {
-    'dbname': os.getenv('DB_NAME', 'vector_db'),
-    'user': os.getenv('DB_USER', 'leiye'),
-    'password': os.getenv('DB_PASSWORD', ''),
+    'dbname': os.getenv('DB_NAME', 'rag_db'),  # Från .env-filen
+    'user': os.getenv('DB_USER', 'postgres'),   # Standard PostgreSQL-användare
+    'password': os.getenv('DB_PASSWORD', 'postgres'),  # Från .env-filen
     'host': os.getenv('DB_HOST', 'localhost'),
     'port': os.getenv('DB_PORT', '5432')
 }
