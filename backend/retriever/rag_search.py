@@ -48,7 +48,7 @@ def search_rag(db: Session, query_text: str, limit: int = 5,
                 if key.startswith("metadata."):
                     # Extrahera metadata-nyckeln
                     metadata_key = key.split(".", 1)[1]
-                    query = query.filter(RagDocument.metadata[metadata_key].astext == str(value))
+                    query = query.filter(RagDocument.meta_data[metadata_key].astext == str(value))
                 else:
                     # För vanliga kolumner
                     query = query.filter(getattr(RagDocument, key) == value)
@@ -65,10 +65,13 @@ def search_rag(db: Session, query_text: str, limit: int = 5,
             max_distance = 10.0  # Godtyckligt maxavstånd för normalisering
             similarity = max(0, 1.0 - (float(distance) / max_distance))
             
+            # Konvertera metadata till ett dictionary om det inte är None
+            metadata_dict = dict(doc.meta_data) if doc.meta_data is not None else {}
+            
             formatted_results.append({
                 "id": doc.id,
                 "content": doc.content,
-                "metadata": doc.metadata,
+                "metadata": metadata_dict,
                 "source_type": doc.source_type,
                 "source_id": doc.source_id,
                 "similarity_score": similarity
@@ -142,10 +145,13 @@ def hybrid_search_rag(db: Session, query_text: str, limit: int = 5,
             # Kombinera poängen (50% vektorlikhet, 50% textrankning)
             combined_score = (vector_similarity + float(text_rank)) / 2.0
             
+            # Konvertera metadata till ett dictionary om det inte är None
+            metadata_dict = dict(doc.meta_data) if doc.meta_data is not None else {}
+            
             formatted_results.append({
                 "id": doc.id,
                 "content": doc.content,
-                "metadata": doc.metadata,
+                "metadata": metadata_dict,
                 "source_type": doc.source_type,
                 "source_id": doc.source_id,
                 "similarity_score": combined_score,
