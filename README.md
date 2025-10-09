@@ -90,5 +90,24 @@ Undecided:
 
 ### 1. Clone and Install
 ```bash
-git clone https://github.com/yourusername/rag-knowledge-assistant.git
-cd rag-knowledge-assistant
+git clone https://github.com/leiyese/agile-methods-rainbow6.git
+cd agile-methods-rainbow6
+```
+
+### 2. Set Up Environment Variables
+Copy the example environment file and update it with your settings:
+```bash
+cp .env.example .env
+```
+
+Then edit the `.env` file and add your Gemini API key:
+```
+GEMINI_API=your_gemini_api_key_here
+```
+
+#### Getting a Gemini API Key
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key or use an existing one
+3. Copy the key and paste it in your `.env` file
+
+### 3. Start the Application
