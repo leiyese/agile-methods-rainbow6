@@ -65,7 +65,7 @@ export default function Chat() {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <h2>Rainbow6 Assistent</h2>
+        <h2>A-Z chatbot</h2>
         <p>Fråga mig vad som helst för att komma igång!</p>
       </div>
 
@@ -73,7 +73,7 @@ export default function Chat() {
         {messages.length === 0 && (
           <div className="welcome-message">
             <p>
-              Hej! Jag är din Rainbow6 assistent. Hur kan jag hjälpa dig idag?
+              Hej! Jag är din A-Z chatbot. Hur kan jag hjälpa dig idag?
             </p>
           </div>
         )}
