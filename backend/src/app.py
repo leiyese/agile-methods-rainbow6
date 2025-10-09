@@ -1,8 +1,6 @@
 import os
 import sys
 
-# Add the directory containing this script to sys.path
-# This allows for absolute imports relative to the 'src' directory
 script_dir = os.path.dirname(__file__)
 project_base_dir = os.path.dirname(script_dir)
 if project_base_dir not in sys.path:
@@ -17,11 +15,13 @@ from src.blueprints.assistant import bp as assistant_bp
 # import llm wrapper
 from agents.llm_wrapper import GeminiLLM
 
+from database.init_schema import init_database_schema  
+from database.init_documents import init_documents
+
 
 def create_app():
     app = Flask(__name__, template_folder="templates")
 
-    # Initialiserar LLM modellen
     app.config["LLM"] = GeminiLLM()
 
     raw_url = os.environ.get("DATABASE_URL")
@@ -63,13 +63,14 @@ def create_app():
     except json.JSONDecodeError:
         app.config["COPY"] = {}
 
-
-
     app.register_blueprint(main_bp)
     app.register_blueprint(assistant_bp)
 
     with app.app_context():
         db.create_all()
+        
+        init_database_schema(db, project_base_dir)
+        init_documents(db, project_base_dir)
 
     return app
 
