@@ -13,15 +13,19 @@ Supports two embedding modes:
 """
 
 import os
+import sys
 import time
+
+# Add the parent directory (backend) to the system path to allow imports from sibling directories
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import tiktoken
 from datetime import datetime
 from typing import List, Dict, Tuple
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from .llm_wrapper import GeminiLLM
-from .local_embeddings import LocalLLM
+from llm_wrapper import GeminiLLM
+from local_embeddings import LocalLLM
 from database.config import CHUNK_SIZE, CHUNK_OVERLAP, EMBEDDING_DIMENSION
 from database.utils import (
     insert_document,
