@@ -15,6 +15,7 @@ scikit-learn
 scipy
 sentence-transformers
 tiktoken
+spacy>=3.6.0
 
 # --- LangChain (no Google adapter to avoid conflicts) ---
 langchain
@@ -32,3 +33,4 @@ requests
 pypdf2
 
 debugpy
+
