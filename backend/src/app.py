@@ -70,7 +70,7 @@ def create_app():
         db.create_all()
         
         init_database_schema(db, project_base_dir)
-        init_documents(db, project_base_dir)
+        #init_documents(db, project_base_dir)
 
     return app
 

@@ -1,25 +1,36 @@
-# Web Framework
+# --- Core Web ---
 flask
 flask-cors
-gunicorn
 flask-sqlalchemy
+gunicorn
+python-dotenv
 
-# Database
+# --- Database ---
 psycopg2-binary
 pgvector
 
-# AI/LLM
-google-genai
+# --- Data / ML ---
+numpy
+scikit-learn
+scipy
 sentence-transformers
 tiktoken
+spacy>=3.6.0
 
-# PDF Processing
-pypdf2
+# --- LangChain (no Google adapter to avoid conflicts) ---
 langchain
 langchain-community
-langchain-google-genai
+langchain-core
+langchain-text-splitters
+langsmith
 
-# Utilities
-python-dotenv
-numpy
+# --- Google Gemini SDKs ---
+google-genai==1.40.0           # v1beta (generation)
+google-generativeai==0.8.5     # v1 (embeddings: text-embedding-004)
+
+# --- Utilities ---
+requests
+pypdf2
+
 debugpy
+
