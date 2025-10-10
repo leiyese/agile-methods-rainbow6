@@ -33,6 +33,7 @@ pnpm-debug.log*
 /.parcel-cache
 /.next
 /out
+backend\output
 
 # Environment files
 .env
@@ -49,3 +50,10 @@ pnpm-debug.log*
 # ---- OS files ----
 .DS_Store
 Thumbs.db
+
+# Backend output and generated files
+backend/output/
+backend/rag_docs/
+
+# Python bytecode
+backend/**/__pycache__/
