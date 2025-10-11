@@ -12,6 +12,8 @@ from src.extensions import db, cors
 from src.blueprints.main import bp as main_bp
 from src.blueprints.assistant import bp as assistant_bp
 
+from utils import env_logging
+
 # import llm wrapper
 from agents.llm_wrapper import GeminiLLM
 
@@ -37,6 +39,8 @@ def create_app():
         },
     )
 
+    env_logging.log_env_vars()
+    
     db.init_app(app)
 
     is_prod = (
