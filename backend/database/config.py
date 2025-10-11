@@ -29,5 +29,5 @@ CHUNK_SIZE = 512  # characters
 CHUNK_OVERLAP = 50  # characters
 
 # Search configuration
-DEFAULT_MATCH_THRESHOLD = 0.5  # Minimum similarity score
-DEFAULT_MATCH_COUNT = 5  # Number of results to return
+DEFAULT_MATCH_THRESHOLD = float(os.environ.get("MATCH_THRESHOLD", 0.5))
+DEFAULT_MATCH_COUNT = int(os.environ.get("MATCH_COUNT", 5))

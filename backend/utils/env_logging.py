@@ -5,7 +5,7 @@ def log_env_vars():
     keys = [
         "DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT",
         "DATABASE_URL", "FRONTEND_URL", "FLASK_ENV", "RENDER",
-        "EMBEDDING_MODEL", "GENERATION_MODEL", "GEMINI_API_KEY"
+        "EMBEDDING_MODEL", "GENERATION_MODEL", "GEMINI_API_KEY","MATCH_COUNT", "MATCH_THRESHOLD"
     ]
 
     print("\n=== ENVIRONMENT VARIABLES AT STARTUP (Render Debug) ===")
