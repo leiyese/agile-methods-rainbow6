@@ -35,8 +35,8 @@ def create_app():
         raise RuntimeError("DATABASE_URL must be set in production!")
     if raw_url and raw_url.startswith("postgres://"):
         raw_url = raw_url.replace("postgres://", "postgresql://", 1)
-    # Ensure SSL for Render Postgres
-    if raw_url and "sslmode=" not in raw_url:
+    # Only require SSL in production
+    if is_prod and raw_url and "sslmode=" not in raw_url:
         sep = "&" if "?" in raw_url else "?"
         raw_url += f"{sep}sslmode=require"
     app.config["SQLALCHEMY_DATABASE_URI"] = raw_url or "sqlite:///rainbow6.db"
@@ -85,7 +85,7 @@ def create_app():
     with app.app_context():
         db.create_all()
         init_database_schema(db, project_base_dir)
-        
+
         # --- DB Health Probe ---
         from sqlalchemy import text
 
@@ -94,7 +94,7 @@ def create_app():
                 text("SELECT COUNT(*) FROM documents")
             ).scalar()
             chunk_count = db.session.execute(
-                text("SELECT COUNT(*) FROM chunks")
+                text("SELECT COUNT(*) FROM document_chunks")
             ).scalar()
             print(f"[DB HEALTH] Documents: {doc_count}, Chunks: {chunk_count}")
         except Exception as e:
