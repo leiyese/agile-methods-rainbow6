@@ -84,9 +84,21 @@ def create_app():
 
     with app.app_context():
         db.create_all()
-
         init_database_schema(db, project_base_dir)
-        # init_documents(db, project_base_dir)
+        
+        # --- DB Health Probe ---
+        from sqlalchemy import text
+
+        try:
+            doc_count = db.session.execute(
+                text("SELECT COUNT(*) FROM documents")
+            ).scalar()
+            chunk_count = db.session.execute(
+                text("SELECT COUNT(*) FROM chunks")
+            ).scalar()
+            print(f"[DB HEALTH] Documents: {doc_count}, Chunks: {chunk_count}")
+        except Exception as e:
+            print(f"[DB HEALTH] Error checking DB: {e}")
 
     return app
 
