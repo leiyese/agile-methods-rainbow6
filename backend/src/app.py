@@ -48,7 +48,10 @@ def create_app():
         if frontend_url:
             cors.init_app(app, origins=[frontend_url])
         else:
-            cors.init_app(app, origins=[])
+            import warnings
+            warnings.warn("FRONTEND_URL not set! CORS will allow only localhost for debugging.")
+            raise RuntimeError("FRONTEND_URL must be set in production!")
+
     else:
         cors.init_app(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
