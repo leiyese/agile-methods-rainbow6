@@ -9,11 +9,11 @@ load_dotenv()
 
 # PostgreSQL connection parameters
 DB_CONFIG = {
-    'dbname': os.getenv('DB_NAME', 'vector_db'),
-    'user': os.getenv('DB_USER', 'leiye'),
-    'password': os.getenv('DB_PASSWORD', ''),
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': os.getenv('DB_PORT', '5432')
+    'dbname': os.getenv['DB_NAME'],
+    'user': os.getenv['DB_USER'],
+    'password': os.getenv['DB_PASSWORD'],
+    'host': os.getenv['DB_HOST'],
+    'port': os.getenv['DB_PORT']
 }
 
 # Connection string for SQLAlchemy (if needed)
