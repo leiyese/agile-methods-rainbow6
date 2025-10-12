@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import "./Chat.css";
 import ChatInput from "./ChatInput";
 import { askAssistant } from '../../api/assistantApi';
+import Logo from "./Logo"
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -65,8 +66,7 @@ export default function Chat() {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <h2>A-Z chatbot</h2>
-        <p>Fråga mig vad som helst för att komma igång!</p>
+        <Logo />
       </div>
 
       <div className="chat-messages">
