@@ -16,6 +16,12 @@
   padding: 1rem;
 }
 
+@media (max-width: 768px) {
+  .app-container:has(.chat-container) {
+    padding: 0;
+  }
+}
+
 * {
   box-sizing: border-box;
 }
