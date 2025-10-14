@@ -59,8 +59,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flip-container">
+          </div><div className="flip-container">
             <div className="flip flip-right">
               <div className="front front-right">
                 <div className="circle">
@@ -93,8 +92,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flip-container">
+          </div><div className="flip-container">
             <div className="flip flip-right">
               <div className="front front-right">
                 <div className="circle">
@@ -127,8 +125,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="flip-container">
+          </div><div className="flip-container">
             <div className="flip flip-right">
               <div className="front front-right">
                 <div className="circle">
