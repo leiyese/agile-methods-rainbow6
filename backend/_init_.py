@@ -1,4 +1,4 @@
-# backend/run_init_docs.py
+# backend/_init_.py
 import os
 from pathlib import Path
 from types import SimpleNamespace
