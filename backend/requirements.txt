@@ -285,6 +285,8 @@ pydantic-settings==2.11.0
     # via langchain-community
 pygments==2.19.2
     # via rich
+pymupdf==1.26.5
+    # via -r requirements.in
 pyparsing==3.2.5
     # via httplib2
 pypdf2==3.0.1
