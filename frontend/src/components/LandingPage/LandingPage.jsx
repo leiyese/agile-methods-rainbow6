@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { IoChatbubblesOutline } from 'react-icons/io5'; // Natural conversation
-import { IoFlashOutline } from 'react-icons/io5'; // Fast answers
-import { IoDocumentTextOutline } from 'react-icons/io5'; // Document knowledge
+import { IoChatbubblesOutline, IoFlashOutline, IoDocumentTextOutline } from 'react-icons/io5';
+import Button from '../ui/Button';
+import Footer from '../Footer/Footer';
 import './LandingPage.css';
 
 export default function LandingPage() {
@@ -29,15 +29,12 @@ export default function LandingPage() {
     <div className="landing-container">
       {/* Hero Section */}
       <div className="hero-section">
-        <h1 className="hero-title">A-Z Försäkringsassistent</h1>
+        <h1 className="hero-title">A–Z Försäkringsassistent</h1>
         <p className="hero-description">
-          En intelligent chatbot som hjälper dig förstå dina försäkringsvillkor.
-        </p>
-        <p className="hero-description">
-          Ställ frågor på svenska och få tydliga svar baserat på dokument.
-        </p>
-        <p className="hero-subtitle">
-          Skapad för att göra försäkringsinformation lättillgänglig och begriplig.
+          Försäkringsinformation – på ett ögonblick<br />
+          Kombinerar din expertis med intelligent AI<br />
+          Assistenten hjälper dig med exakta svar baserat<br />
+          på interna villkor och policys.
         </p>
       </div>
 
@@ -148,13 +145,12 @@ export default function LandingPage() {
 
       {/* CTA Button */}
       <div className="cta-section">
-        <button 
-          className="cta-button"
-          onClick={() => navigate('/chat')}
-        >
-          Ta mig till A-Z
-        </button>
+        <Button onClick={() => navigate('/app')}>
+          Kom igång nu →
+        </Button>
       </div>
+      
+      <Footer />
     </div>
   );
 }

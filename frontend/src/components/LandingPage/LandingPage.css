@@ -1,12 +1,39 @@
 .landing-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #003b89 100%);
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2rem;
   color: white;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+}
+
+.landing-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("https://res.cloudinary.com/dh4nepzch/image/upload/v1760255026/city_scape_tybiar.jpg") center top no-repeat;
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.85;
+  z-index: -2;
+}
+
+.landing-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(0, 59, 137, 0.7) 100%);
+  z-index: -1;
 }
 
 /* Hero Section */
@@ -18,18 +45,35 @@
 }
 
 .hero-title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1.25rem;
   color: #ffffff;
+  text-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(33, 150, 243, 0.3),
+    0 0 50px rgba(33, 150, 243, 0.2);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 .hero-description {
-  font-size: 1.25rem;
-  line-height: 1.6;
-  margin-bottom: 0.75rem;
-  color: #ffffff;
-  white-space: nowrap;
+  font-size: 1.3rem;
+  line-height: 1.8;
+  margin-bottom: 0.65rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 
+    0 2px 15px rgba(0, 0, 0, 0.3),
+    0 0 25px rgba(33, 150, 243, 0.3),
+    0 0 40px rgba(33, 150, 243, 0.2);
+}
+
+.hero-description:last-of-type {
+  margin-bottom: 0;
 }
 
 .hero-subtitle {
@@ -52,8 +96,22 @@
 
 .wrapper {
   display: inline-block;
-  background: #01579B;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  background: linear-gradient(145deg, #0277BD, #01579B);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 6px 10px rgba(0,0,0,0.2);
+  border-radius: 20px;
+  position: relative;
+}
+
+.wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 20px 20px 0 0;
+  pointer-events: none;
 }
 
 /* entire container, keeps perspective */
@@ -98,9 +156,37 @@
 /* front pane, placed above back */
 .front {
   z-index: 2;
-  background: #2196F3;
+  background: linear-gradient(145deg, #42A5F5, #2196F3);
   transform: rotateY(0deg);
   overflow: hidden;
+  position: relative;
+}
+
+.front::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.front-left {
+  border-radius: 20px 0 0 20px;
+}
+
+.front-left::before {
+  border-radius: 20px 0 0 20px;
+}
+
+.front-right {
+  border-radius: 0 20px 20px 0;
+}
+
+.front-right::before {
+  border-radius: 0 20px 20px 0;
 }
 
 .front-left .circle {
@@ -131,7 +217,7 @@
 
 .flip-icon {
   font-size: 3rem;
-  color: #003b89;
+  color: #D62220;
 }
 
 /* back, initially hidden pane */
@@ -139,6 +225,15 @@
   background: #ffffff;
   transform: rotateY(180deg);
   overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.back-left {
+  border-radius: 0 20px 20px 0;
+}
+
+.back-right {
+  border-radius: 20px 0 0 20px;
 }
 
 .features-section img {
@@ -199,29 +294,7 @@
   animation: fadeInUp 1s ease-out;
 }
 
-.cta-button {
-  padding: 1rem 3rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #003b89;
-  background: white;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  text-transform: none;
-}
-
-.cta-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
-}
-
-.cta-button:active {
-  transform: translateY(-1px);
-}
+/* CTA button styles now in Button.css */
 
 /* Animations */
 @keyframes fadeInDown {
