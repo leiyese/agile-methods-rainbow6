@@ -75,7 +75,7 @@ The first run will take longer as Docker needs to:
 You'll know everything is ready when you see:
 ```
 backend-1   | * Running on all addresses (0.0.0.0)
-backend-1   | * Running on http://127.0.0.1:5000
+backend-1   | * Running on http://127.0.0.1:8001
 frontend-1  | Local:   http://localhost:5173/
 postgres-1  | database system is ready to accept connections
 ```
@@ -83,7 +83,7 @@ postgres-1  | database system is ready to accept connections
 ### 5. Access the Application
 Once everything is running, you can access:
 - **Frontend (React UI)**: http://localhost:5173
-- **Backend API**: http://localhost:5000
+- **Backend API**: http://localhost:8001
 - **Database**: localhost:5432 (if you need direct database access)
 
 ## Common Commands
@@ -130,7 +130,7 @@ docker-compose up
 ## Troubleshooting
 
 ### Port Already in Use
-If you see errors like "port 5000 is already in use":
+If you see errors like "port 8001 is already in use":
 1. Stop any other applications using those ports
 2. Or modify the ports in `docker-compose.yml`
 
@@ -155,7 +155,7 @@ The setup uses volume mounts, so your code changes should appear immediately:
 ### Making Backend Changes
 1. Edit files in the `backend/` directory
 2. Flask will automatically reload (you'll see restart messages in logs)
-3. Test your changes at http://localhost:5000
+3. Test your changes at http://localhost:8001
 
 ### Making Frontend Changes  
 1. Edit files in the `frontend/` directory
