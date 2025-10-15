@@ -30,11 +30,10 @@ class GeminiLLM:
     ):
         # ---- Models ----
         self.gen_model = os.getenv("GENERATION_MODEL", gen_model)
-        # Hard-set to v1 model that works
-        self.emb_model = emb_model or os.getenv("EMBEDDING_MODEL", "models/text-embedding-004")
+        self.emb_model = os.getenv("EMBEDDING_MODEL", emb_model")
 
         # ---- API key ----
-        self._api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API")
+        self._api_key = api_key or os.getenv("GEMINI_API_KEY") 
         if not self._api_key:
             logger.warning("No GEMINI_API_KEY set. Both embeddings and generation will fail.")
         key_prefix = (self._api_key[:6] + "…") if self._api_key else "missing"
