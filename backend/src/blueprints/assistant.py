@@ -223,11 +223,17 @@ def answer():
             for i, chunk in enumerate(similar_chunks, 1):
                 doc_name = chunk.get("filename", f"Document {i}")
                 section = chunk.get("section") or chunk.get("section_title") or ""
+                link = chunk.get("link")
+
+                # Chunks without page numbers for now
                 label = f"{doc_name}"
                 if section:
                     label += f" ({section})"
+
+                if link:
+                    label = f"[{label}]({link})"
                 # Remove page number from label since we don´t have that working yet in the ingestion process
-                context_parts.append(f"[{label}] {chunk['content']}")
+                context_parts.append(f"{label} {chunk['content']}")
             context = "\n\n".join(context_parts)
 
             # Build RAG prompt
