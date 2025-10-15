@@ -11,9 +11,8 @@ pgvector
 
 # --- Data / ML ---
 numpy
-scikit-learn
+#scikit-learn
 scipy
-sentence-transformers
 tiktoken
 spacy>=3.6.0
 
@@ -30,8 +29,15 @@ google-generativeai==0.8.5     # v1 (embeddings: text-embedding-004)
 
 # --- Utilities ---
 requests
-pypdf2
-PyMuPDF # Will replace pypdf2 if it works better
-
 debugpy
+
+# --- PDF + Table parsing ---
+PyMuPDF>=1.24.0
+camelot-py==1.0.9
+opencv-python>=4.9.0.80
+ghostscript>=0.7
+# Camelot on Python <3.12 needs pypdf<4
+pypdf>=3.17,<4
+
+
 

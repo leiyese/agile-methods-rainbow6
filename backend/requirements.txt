@@ -22,8 +22,10 @@ blinker==1.9.0
     # via flask
 blis==1.3.0
     # via thinc
-cachetools==6.2.0
+cachetools==6.2.1
     # via google-auth
+camelot-py==1.0.9
+    # via -r requirements.in
 catalogue==2.0.10
     # via
     #   spacy
@@ -34,10 +36,17 @@ certifi==2025.10.5
     #   httpcore
     #   httpx
     #   requests
-charset-normalizer==3.4.3
-    # via requests
+cffi==2.0.0
+    # via cryptography
+chardet==5.2.0
+    # via camelot-py
+charset-normalizer==3.4.4
+    # via
+    #   pdfminer-six
+    #   requests
 click==8.3.0
     # via
+    #   camelot-py
     #   flask
     #   typer
 cloudpathlib==0.23.0
@@ -51,6 +60,8 @@ confection==0.1.5
     # via
     #   thinc
     #   weasel
+cryptography==46.0.2
+    # via pdfminer-six
 cymem==2.0.11
     # via
     #   preshed
@@ -60,11 +71,8 @@ dataclasses-json==0.6.7
     # via langchain-community
 debugpy==1.8.17
     # via -r requirements.in
-filelock==3.20.0
-    # via
-    #   huggingface-hub
-    #   torch
-    #   transformers
+et-xmlfile==2.0.0
+    # via openpyxl
 flask==3.1.2
     # via
     #   -r requirements.in
@@ -78,10 +86,8 @@ frozenlist==1.8.0
     # via
     #   aiohttp
     #   aiosignal
-fsspec==2025.9.0
-    # via
-    #   huggingface-hub
-    #   torch
+ghostscript==0.8.1
+    # via -r requirements.in
 google-ai-generativelanguage==0.6.15
     # via google-generativeai
 google-api-core[grpc]==2.26.0
@@ -131,14 +137,9 @@ httpx==0.28.1
     # via
     #   google-genai
     #   langsmith
-httpx-sse==0.4.2
+httpx-sse==0.4.3
     # via langchain-community
-huggingface-hub==0.35.3
-    # via
-    #   sentence-transformers
-    #   tokenizers
-    #   transformers
-idna==3.10
+idna==3.11
     # via
     #   anyio
     #   httpx
@@ -150,9 +151,6 @@ jinja2==3.1.6
     # via
     #   flask
     #   spacy
-    #   torch
-joblib==1.5.2
-    # via scikit-learn
 jsonpatch==1.33
     # via langchain-core
 jsonpointer==3.0.0
@@ -163,7 +161,7 @@ langchain==0.3.27
     #   langchain-community
 langchain-community==0.3.31
     # via -r requirements.in
-langchain-core==0.3.78
+langchain-core==0.3.79
     # via
     #   -r requirements.in
     #   langchain
@@ -175,7 +173,7 @@ langchain-text-splitters==0.3.11
     #   langchain
 langcodes==3.5.0
     # via spacy
-langsmith==0.4.33
+langsmith==0.4.34
     # via
     #   -r requirements.in
     #   langchain
@@ -196,8 +194,6 @@ marshmallow==3.26.1
     # via dataclasses-json
 mdurl==0.1.2
     # via markdown-it-py
-mpmath==1.3.0
-    # via sympy
 multidict==6.7.0
     # via
     #   aiohttp
@@ -209,36 +205,44 @@ murmurhash==1.0.13
     #   thinc
 mypy-extensions==1.1.0
     # via typing-inspect
-networkx==3.5
-    # via torch
-numpy==2.3.3
+numpy==2.2.6
     # via
     #   -r requirements.in
     #   blis
+    #   camelot-py
     #   langchain-community
+    #   opencv-python
+    #   opencv-python-headless
+    #   pandas
     #   pgvector
-    #   scikit-learn
     #   scipy
     #   spacy
     #   thinc
-    #   transformers
+opencv-python==4.12.0.88
+    # via -r requirements.in
+opencv-python-headless==4.12.0.88
+    # via camelot-py
+openpyxl==3.1.5
+    # via camelot-py
 orjson==3.11.3
     # via langsmith
 packaging==25.0
     # via
     #   gunicorn
-    #   huggingface-hub
     #   langchain-core
     #   langsmith
     #   marshmallow
     #   spacy
     #   thinc
-    #   transformers
     #   weasel
+pandas==2.3.3
+    # via camelot-py
+pdfminer-six==20250506
+    # via camelot-py
 pgvector==0.4.1
     # via -r requirements.in
 pillow==11.3.0
-    # via sentence-transformers
+    # via camelot-py
 preshed==3.0.10
     # via
     #   spacy
@@ -259,7 +263,7 @@ protobuf==5.29.5
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
-psycopg2-binary==2.9.10
+psycopg2-binary==2.9.11
     # via -r requirements.in
 pyasn1==0.6.1
     # via
@@ -267,7 +271,9 @@ pyasn1==0.6.1
     #   rsa
 pyasn1-modules==0.4.2
     # via google-auth
-pydantic==2.12.0
+pycparser==2.23
+    # via cffi
+pydantic==2.12.2
     # via
     #   confection
     #   google-genai
@@ -279,7 +285,7 @@ pydantic==2.12.0
     #   spacy
     #   thinc
     #   weasel
-pydantic-core==2.41.1
+pydantic-core==2.41.4
     # via pydantic
 pydantic-settings==2.11.0
     # via langchain-community
@@ -289,36 +295,38 @@ pymupdf==1.26.5
     # via -r requirements.in
 pyparsing==3.2.5
     # via httplib2
-pypdf2==3.0.1
-    # via -r requirements.in
+pypdf==3.17.4
+    # via
+    #   -r requirements.in
+    #   camelot-py
+pypdfium2==4.30.0
+    # via camelot-py
+python-dateutil==2.9.0.post0
+    # via pandas
 python-dotenv==1.1.1
     # via
     #   -r requirements.in
     #   pydantic-settings
+pytz==2025.2
+    # via pandas
 pyyaml==6.0.3
     # via
-    #   huggingface-hub
     #   langchain
     #   langchain-community
     #   langchain-core
-    #   transformers
 regex==2025.9.18
-    # via
-    #   tiktoken
-    #   transformers
+    # via tiktoken
 requests==2.32.5
     # via
     #   -r requirements.in
     #   google-api-core
     #   google-genai
-    #   huggingface-hub
     #   langchain
     #   langchain-community
     #   langsmith
     #   requests-toolbelt
     #   spacy
     #   tiktoken
-    #   transformers
     #   weasel
 requests-toolbelt==1.0.0
     # via langsmith
@@ -326,21 +334,12 @@ rich==14.2.0
     # via typer
 rsa==4.9.1
     # via google-auth
-safetensors==0.6.2
-    # via transformers
-scikit-learn==1.7.2
-    # via
-    #   -r requirements.in
-    #   sentence-transformers
 scipy==1.16.2
-    # via
-    #   -r requirements.in
-    #   scikit-learn
-    #   sentence-transformers
-sentence-transformers==5.1.1
     # via -r requirements.in
 shellingham==1.5.4
     # via typer
+six==1.17.0
+    # via python-dateutil
 smart-open==7.3.1
     # via weasel
 sniffio==1.3.1
@@ -351,7 +350,7 @@ spacy-legacy==3.0.12
     # via spacy
 spacy-loggers==1.0.5
     # via spacy
-sqlalchemy==2.0.43
+sqlalchemy==2.0.44
     # via
     #   flask-sqlalchemy
     #   langchain
@@ -362,8 +361,8 @@ srsly==2.5.1
     #   spacy
     #   thinc
     #   weasel
-sympy==1.14.0
-    # via torch
+tabulate==0.9.0
+    # via camelot-py
 tenacity==9.1.2
     # via
     #   google-genai
@@ -371,23 +370,12 @@ tenacity==9.1.2
     #   langchain-core
 thinc==8.3.6
     # via spacy
-threadpoolctl==3.6.0
-    # via scikit-learn
 tiktoken==0.12.0
     # via -r requirements.in
-tokenizers==0.22.1
-    # via transformers
-torch==2.8.0
-    # via sentence-transformers
 tqdm==4.67.1
     # via
     #   google-generativeai
-    #   huggingface-hub
-    #   sentence-transformers
     #   spacy
-    #   transformers
-transformers==4.57.0
-    # via sentence-transformers
 typer==0.19.2
     # via
     #   spacy
@@ -399,13 +387,10 @@ typing-extensions==4.15.0
     #   google-genai
     #   google-generativeai
     #   grpcio
-    #   huggingface-hub
     #   langchain-core
     #   pydantic
     #   pydantic-core
-    #   sentence-transformers
     #   sqlalchemy
-    #   torch
     #   typer
     #   typing-inspect
     #   typing-inspection
@@ -415,6 +400,8 @@ typing-inspection==0.4.2
     # via
     #   pydantic
     #   pydantic-settings
+tzdata==2025.2
+    # via pandas
 uritemplate==4.2.0
     # via google-api-python-client
 urllib3==2.5.0
