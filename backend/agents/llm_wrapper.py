@@ -30,7 +30,7 @@ class GeminiLLM:
     ):
         # ---- Models ----
         self.gen_model = os.getenv("GENERATION_MODEL", gen_model)
-        self.emb_model = os.getenv("EMBEDDING_MODEL", emb_model")
+        self.emb_model = os.getenv("EMBEDDING_MODEL", emb_model)
 
         # ---- API key ----
         self._api_key = api_key or os.getenv("GEMINI_API_KEY") 
