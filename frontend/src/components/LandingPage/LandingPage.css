@@ -1,0 +1,288 @@
+.landing-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #003b89 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: white;
+}
+
+/* Hero Section */
+.hero-section {
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 4rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: #ffffff;
+  opacity: 0.85;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* Features Section */
+.features-section {
+  margin-bottom: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.wrapper {
+  display: inline-block;
+  background: #01579B;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+/* entire container, keeps perspective */
+.flip-container {
+  display: inline-block;
+  perspective: 1000px;
+  vertical-align: top; /* Prevent unwanted margin. */
+}
+
+/* flip the pane when hovered */
+.wrapper:hover .flip-left {
+  transform: rotateY(-180deg);
+}
+
+.wrapper:hover .flip-right {
+  transform: rotateY(180deg);
+}
+
+.flip-container,
+.front,
+.back {
+  width: 180px;
+  height: 240px;
+}
+
+/* flip speed goes here */
+.flip {
+  transition: 0.6s;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+/* hide back of pane during swap */
+.front,
+.back {
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* front pane, placed above back */
+.front {
+  z-index: 2;
+  background: #2196F3;
+  transform: rotateY(0deg);
+  overflow: hidden;
+}
+
+.front-left .circle {
+  position: absolute;
+  right: -50px;
+  top: 50%;
+  margin-top: -50px;
+}
+
+.front-right .circle {
+  position: absolute;
+  left: -50px;
+  top: 50%;
+  margin-top: -50px;
+}
+
+.circle {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  background: #ffffff;
+  box-shadow: 0 19px 38px rgba(0,0,0,0.20), 0 15px 12px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flip-icon {
+  font-size: 3rem;
+  color: #003b89;
+}
+
+/* back, initially hidden pane */
+.back {
+  background: #ffffff;
+  transform: rotateY(180deg);
+  overflow: hidden;
+}
+
+.features-section img {
+  width: 360px;
+  height: 240px;
+}
+
+.back-left img {
+  position: absolute;
+  left: 0;
+}
+
+.back-right img {
+  position: absolute;
+  right: 0;
+}
+
+.flip-text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  color: #003b89;
+}
+
+.flip-text-combined {
+  position: absolute;
+  width: 360px;
+  height: 240px;
+  left: 0;
+  top: 0;
+  padding: 2rem;
+}
+
+.flip-text-right {
+  left: -180px;
+}
+
+.flip-text h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #003b89;
+}
+
+.flip-text p {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #01579B;
+}
+
+/* CTA Section */
+.cta-section {
+  animation: fadeInUp 1s ease-out;
+}
+
+.cta-button {
+  padding: 1rem 3rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #003b89;
+  background: white;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  text-transform: none;
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+}
+
+.cta-button:active {
+  transform: translateY(-1px);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+
+  .cta-button {
+    font-size: 1rem;
+    padding: 0.875rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-container {
+    padding: 1rem;
+  }
+
+  .hero-section {
+    margin-bottom: 2rem;
+  }
+
+  .features-section {
+    margin-bottom: 2rem;
+  }
+
+}
