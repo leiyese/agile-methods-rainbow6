@@ -198,11 +198,19 @@ def answer():
                 return (
                     jsonify(
                         {
-                            "answer": answer,
+                            "answer": f"**Svar:**\n\n{answer.strip()}\n\n---\n\n _Genererat av {llm.gen_model}_",
+                            "formatted": True,
                             "model_used": llm.gen_model,
                             "rag_enabled": False,
                             "latency_ms": int((time.time() - t0) * 1000),
                             "trace_id": trace_id,
+                            "sources": [
+                                {
+                                    "id": c.get("document_id"),
+                                    "excerpt": c.get("content", "")[:150] + "...",
+                                }
+                                for c in similar_chunks
+                            ],
                         }
                     ),
                     200,
