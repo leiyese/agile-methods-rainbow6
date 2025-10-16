@@ -91,6 +91,8 @@
 
 .hero-description:last-of-type {
   margin-bottom: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
 }
 
 .hero-subtitle {
@@ -136,6 +138,7 @@
   display: inline-block;
   perspective: 1000px;
   vertical-align: top; /* Prevent unwanted margin. */
+  font-size: 1rem;
 }
 
 /* flip the pane when hovered */
@@ -359,6 +362,20 @@
 
   .features-section {
     gap: 1.5rem;
+    font-size: 1rem;
+    white-space: normal;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .features-section {
+    gap: 1.5rem;
+  }
+
+  .wrapper {
+    transform: scale(0.9);
   }
 
   .wrapper {

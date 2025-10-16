@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import "./Chat.css";
 import ChatInput from "./ChatInput";
-import { askAssistant } from '../../api/assistantApi';
-import Logo from "./Logo"
+import { askAssistant } from "../../api/assistantApi";
+import Logo from "./Logo";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -27,36 +27,35 @@ export default function Chat() {
 
     try {
       const result = await askAssistant(message, false); // Set to true for mock mode
-      
+
       if (result.success) {
         const assistantMessage = {
           type: "assistant",
           content: result.data.answer,
+          sources: result.data.sources || [], // 🟢 Fix: rättat "ources" till "sources"
           metadata: {
             model: result.data.model_used,
             latency: result.data.latency_ms,
-            traceId: result.data.trace_id
-          }
+            traceId: result.data.trace_id,
+          },
         };
-        
+
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
         const errorMessage = {
           type: "assistant",
           content: `Ursäkta, det uppstod ett fel: ${result.error}`,
-          isError: true
+          isError: true,
         };
-        
         setMessages((prev) => [...prev, errorMessage]);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
+      console.error("Unexpected error:", error);
       const errorMessage = {
-        type: "assistant", 
+        type: "assistant",
         content: "Ursäkta, något gick fel. Försök igen senare.",
-        isError: true
+        isError: true,
       };
-      
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -79,6 +78,27 @@ export default function Chat() {
                 {msg.type === "user" ? "Du" : "Assistent"}:
               </strong>
               <p>{msg.content}</p>
+
+              {/* 🟢 Visa källor om de finns */}
+              {msg.sources && msg.sources.length > 0 && msg.type === "assistant" && (
+                <div className="sources">
+                  <h4 className="sources-title">Källor:</h4>
+                  {msg.sources.map((src, i) => (
+                    <div key={i} className="source-item">
+                      <a
+                        href={src.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="source-link"
+                      >
+                        {src.document}
+                      </a>
+                      {src.section && <span> — {src.section}</span>}
+                      <p className="excerpt">{src.excerpt}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -101,6 +121,7 @@ export default function Chat() {
 
         <div ref={messagesEndRef} />
       </div>
+
       <ChatInput
         inputValue={inputValue}
         setInputValue={setInputValue}

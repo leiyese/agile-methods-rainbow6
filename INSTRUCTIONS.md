@@ -13,10 +13,10 @@
    This command builds an image named `agile-backend` from the Dockerfile in the current directory.
 3. Run the Docker container:
    ```sh
-   docker run -p 5000:5000 agile-backend
+   docker run -p 8001:8001 agile-backend
    ```
-   - The `-p 5000:5000` flag maps port 5000 on your machine to port 5000 in the container.
-4. Done! Your backend should now be accessible at [http://localhost:5000](http://localhost:5000).
+   - The `-p 8001:8001` flag maps port 8001 on your machine to port 8001 in the container.
+4. Done! Your backend should now be accessible at [http://localhost:8001](http://localhost:8001).
 
 ---
 

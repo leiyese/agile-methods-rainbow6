@@ -57,3 +57,4 @@ backend/rag_docs/
 
 # Python bytecode
 backend/**/__pycache__/
+backend/pgvector/

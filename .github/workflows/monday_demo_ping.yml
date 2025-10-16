@@ -1,0 +1,15 @@
+name: Keep Render Alive (Monday Demo)
+
+on:
+  schedule:
+    - cron: "*/15 7-9 * * 1"
+  workflow_dispatch:          
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend
+        run: |
+          echo "Pinging backend to keep it up and ready for demo"
+          curl -s -o /dev/null -w "%{http_code}" https://flask-backend-wdow.onrender.com/health || true

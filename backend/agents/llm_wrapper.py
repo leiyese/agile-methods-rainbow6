@@ -89,8 +89,8 @@ class GeminiLLM:
     def generate(
         self,
         prompt: str,
-        max_tokens: int = 400,
-        temperature: float = 0.0,
+        max_tokens: int = 5000,
+        temperature: float = 0.4,
     ) -> str:
         """Generate a chatbot response from a RAG-style prompt."""
         if self.client is None:
