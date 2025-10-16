@@ -11,6 +11,7 @@ services:
     plan: free
     region: frankfurt
     rootDir: backend
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -21,6 +22,10 @@ services:
           name: react-frontend
           type: web
           envVarKey: RENDER_EXTERNAL_URL
+      - key: MATCH_THRESHOLD
+        value: "0.25"
+      - key: MATCH_COUNT
+        value: "8"
 
   - type: web
     name: react-frontend

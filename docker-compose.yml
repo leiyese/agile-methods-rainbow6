@@ -2,18 +2,23 @@ services:
   backend:
     build:
       context: ./backend
+    env_file:
+      - .env
     ports:
-      - "5000:5000"
+      - "5001:5000"
+      - "5678:5678"  # Port for debugpy
     environment:
       - FLASK_DEBUG=1
       - PYTHONPATH=/app
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     volumes:
       - ./backend:/app
     working_dir: /app
-    command: python -m flask --app src.app:create_app --debug run --host=0.0.0.0 --port=5000
+    #command: python -m flask --app src.app:create_app --debug run --host=0.0.0.0 --port=5000
+    command: python -m debugpy --listen 0.0.0.0:5678 -m flask --app src.app:create_app run --host=0.0.0.0 --port=5000
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy  # Wait for postgres to be ready
 
   frontend:
     build:
@@ -26,18 +31,24 @@ services:
       - /app/node_modules
     environment:
       - VITE_HOST=0.0.0.0
-      - VITE_API_URL=http://localhost:5000
+      - VITE_API_URL=http://localhost:5001
 
   postgres:
-    image: postgres:15
+    image: pgvector/pgvector:pg15
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql  # Auto-run schema
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
