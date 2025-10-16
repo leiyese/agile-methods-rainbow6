@@ -26,7 +26,7 @@ COPY . .
 ENV PYTHONPATH=/app
 
 # Expose port
-EXPOSE 5000
+EXPOSE 8001
 
 # Use gunicorn for production (better than dev server)
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "120", "src.app:create_app()"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8001", "--workers", "1", "--timeout", "120", "src.app:create_app()"]
