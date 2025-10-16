@@ -18,7 +18,7 @@ Example:
 import logging
 from typing import List
 import numpy as np
-from sentence_transformers import SentenceTransformer
+SentenceTransformer = None  # lazy import
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class LocalEmbeddings:
     - First run downloads model (~420MB for mpnet, ~90MB for MiniLM)
     """
     
-    def __init__(self, model_name: str = 'all-mpnet-base-v2'):
+    def __init__(self, model_name: str = 'all-MiniLM-L6-v2'):
         """
         Initialize local embedding model
         
@@ -58,12 +58,19 @@ class LocalEmbeddings:
             logger.info("(First run will download model, ~90MB)")
         
         try:
-            # Load without token to avoid authentication issues
+            global SentenceTransformer
+            if SentenceTransformer is None:
+                from sentence_transformers import SentenceTransformer  # lazy import
+             # Load without token to avoid authentication issues
             self.model = SentenceTransformer(model_name, token=False)
             self.embedding_dimension = self.model.get_sentence_embedding_dimension()
             logger.info(f"✓ Model loaded: {model_name} ({self.embedding_dimension}D)")
         except Exception as e:
-            logger.error(f"Failed to load model: {e}")
+            logger.error(
+                "Failed to load local model. "
+                "Install optional deps: `pip install sentence-transformers`. "
+                f"Detail: {e}"
+            )
             raise
     
     def embed(self, texts: List[str]) -> List[np.ndarray]:

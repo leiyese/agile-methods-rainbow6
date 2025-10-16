@@ -1,3 +1,11 @@
+
+## Usage Overview
+This folder contains scripts for document processing, chunking, metadata extraction, and database insertion.
+For deployment, we rely on the unified workflow in backend/scripts for consistency and automated ingestion.
+
+Embeddings: Default = Gemini API.
+Local embeddings are optional and intended for local testing only.
+
 # Semantisk PDF-chunker för juridiska dokument
 
 Detta verktyg implementerar en specialiserad chunkning-strategi för juridiska/försäkringsdokument i PDF-format, med fokus på semantisk struktur snarare än godtyckliga token-gränser.

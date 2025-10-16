@@ -31,8 +31,7 @@ class GeminiLLM:
         # ---- Models ----
         self.gen_model = os.getenv("GENERATION_MODEL", gen_model)
         # Hard-set to v1 model that works
-        self.emb_model = emb_model or os.getenv("EMBEDDING_MODEL", "models/text-embedding-004")
-
+        self.emb_model = os.getenv("EMBEDDING_MODEL", emb_model or "models/text-embedding-004")
         # ---- API key ----
         self._api_key = api_key or os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API")
         if not self._api_key:

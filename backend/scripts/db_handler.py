@@ -20,7 +20,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 try:
     from database.utils import insert_document, insert_chunk, update_document_status
     from agents.llm_wrapper import GeminiLLM
-    #from agents.local_embeddings import LocalLLM
+    #from agents.local_embeddings import LocalLLM, Only allow Gemini embeddings
     import psycopg2
     from psycopg2.extras import Json
     from database.config import DB_CONFIG
