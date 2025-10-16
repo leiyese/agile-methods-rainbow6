@@ -65,7 +65,7 @@ export default function Chat() {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <Logo />
+        <Logo width={120} height={120} />
         <h2 className="chat-header-title">Hur kan jag hjälpa dig idag?</h2>
       </div>
 
