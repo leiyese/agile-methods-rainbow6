@@ -221,19 +221,19 @@ def answer():
             # Format retrieved chunks as context
             context_parts = []
             for i, chunk in enumerate(similar_chunks, 1):
-                doc_name = chunk.get("filename", f"Document {i}")
-                section = chunk.get("section") or chunk.get("section_title") or ""
+                doc_name = chunk.get("filename") or f"Dokument {i}"
+                section = chunk.get("section") or chunk.get("section_title") or "Okänt avsnitt"
+                page_number = chunk.get("page_number") or "Okänd sida"
+                date = chunk.get("date") or "Okänt datum"
                 link = chunk.get("link")
 
                 # Chunks without page numbers for now
-                label = f"{doc_name}"
-                if section:
-                    label += f" ({section})"
-
+                label = f"{doc_name} (Avsnitt: {section}, Sida: {page_number}, Datum: {date})"
                 if link:
                     label = f"[{label}]({link})"
+
                 # Remove page number from label since we don´t have that working yet in the ingestion process
-                context_parts.append(f"{label} {chunk['content']}")
+                context_parts.append(f"{label}\n{chunk.get('content', '')}")
             context = "\n\n".join(context_parts)
 
             # Build RAG prompt
@@ -273,6 +273,15 @@ def answer():
                         "context_count": len(similar_chunks),
                         "latency_ms": int((time.time() - t0) * 1000),
                         "trace_id": trace_id,
+                        "sources": [
+                            {
+                                "document": chunk.get("filename", f"Dokument {i+1}"),
+                                "section": chunk.get("section") or chunk.get("section_title") or None,
+                                "link": chunk.get("link"),
+                                "excerpt": chunk.get("content", "")[:150] + "..."
+                            }
+                            for i, chunk in enumerate(similar_chunks)
+                        ],
                     }
                 ),
                 200,
@@ -315,11 +324,11 @@ def answer():
         return (
             jsonify(
                 {
-                    "error": "InternalServerError",
-                    "message": "Failed to generate response",
+                    "error": "ServiceUnavailable",
+                    "message": "Modellen är tillfälligt överbelastad. Försök igen om en stund.",
                 }
             ),
-            500,
+            503,
         )
 
 
