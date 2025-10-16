@@ -28,6 +28,29 @@ except ImportError:
     HAS_SPACY = False
     nlp = None
 
+def with_meta_header(text: str, section_code: str, section_title: str) -> str:
+    """
+    Liten helper som lägger rubriken först i chunken för bättre semantik i embeddings.
+    Anropa frivilligt där ni skapar chunk-content:
+        content = with_meta_header(content, code, title)
+    """
+    header = f"[{section_code} {section_title}]".strip()
+    return f"{header}\n{text}".strip()
+
+
+# --- Token counter (tiktoken om finns, annars fallback) ---
+try:
+    import tiktoken
+    _enc = tiktoken.get_encoding("cl100k_base")
+
+    def approx_token_count(text: str) -> int:
+        # Mer korrekt token-antal när tiktoken finns
+        return len(_enc.encode(text or ""))
+except Exception:
+    def approx_token_count(text: str) -> int:
+        # Enkel fallback: ~1 token ≈ 0.75 ord
+        words = len(re.findall(r"\w+", text or ""))
+        return max(1, int(words * 4 / 3))
 
 def extract_sections(text: str) -> List[Dict[str, Any]]:
     """
@@ -231,7 +254,7 @@ def extract_icd_codes(text: str) -> List[str]:
     return icd_pattern.findall(text)
 
 
-def merge_short_chunks(chunks: List[Dict[str, Any]], min_tokens: int = 150) -> List[Dict[str, Any]]:
+def merge_short_chunks(chunks: List[Dict[str, Any]], min_tokens: int = 250) -> List[Dict[str, Any]]:
     """
     Merge short chunks with the next chunk if they're from the same section
     
@@ -255,7 +278,7 @@ def merge_short_chunks(chunks: List[Dict[str, Any]], min_tokens: int = 150) -> L
             # Merge chunks
             merged_text = current_chunk['content'] + "\n\n" + next_chunk['content']
             current_chunk['content'] = merged_text
-            current_chunk['token_count'] = len(merged_text.split())
+            current_chunk['token_count'] = approx_token_count(merged_text)
             current_chunk['page_end'] = next_chunk['page_end']
             # Merge other metadata as needed
             current_chunk['topic_tags'] = list(set(current_chunk['topic_tags'] + next_chunk['topic_tags']))
