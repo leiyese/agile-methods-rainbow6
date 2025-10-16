@@ -23,6 +23,7 @@ from database.init_documents import init_documents
 
 def create_app():
     app = Flask(__name__, template_folder="templates")
+    app.secret_key = 'your_super_secret_key_here'
 
     app.config["LLM"] = GeminiLLM()
 
@@ -79,8 +80,8 @@ def create_app():
     except json.JSONDecodeError:
         app.config["COPY"] = {}
 
-    app.register_blueprint(main_bp)
-    app.register_blueprint(assistant_bp)
+    # app.register_blueprint(main_bp)
+    # app.register_blueprint(assistant_bp)
 
     with app.app_context():
         db.create_all()
@@ -100,11 +101,29 @@ def create_app():
         except Exception as e:
             print(f"[DB HEALTH] Error checking DB: {e}")
 
+     # uploads
+    # project_base_dir = os.path.dirname(os.path.dirname(__file__))
+    UPLOAD_FOLDER = os.path.join(project_base_dir, "uploads")
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+    #register blueprint
+    from src.blueprints.admin import bp as admin_bp
+    app.register_blueprint(admin_bp)
+    
+    # Basic Auth 
+    app.config['ADMIN_USERNAME'] = os.environ.get('ADMIN_USERNAME', 'admin')
+    app.config['ADMIN_PASSWORD'] = os.environ.get('ADMIN_PASSWORD', '123456')
+
+    
+    app.register_blueprint(main_bp)
+    app.register_blueprint(assistant_bp)
+
     return app
 
 
 if __name__ == "__main__":
     app = create_app()
-    port = int(os.environ.get("PORT", 8001))
+    port = int(os.environ.get("PORT", 5000))
     debug_mode = os.environ.get("FLASK_DEBUG", "0") == "1"
     app.run(host="0.0.0.0", port=port, debug=debug_mode)

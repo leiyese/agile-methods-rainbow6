@@ -13,6 +13,10 @@ import time
 from typing import List, Dict, Any
 from datetime import datetime
 
+from typing import List, Dict, Any, Optional
+
+from psycopg2.extras import RealDictCursor, Json
+
 # Add the parent directory to the system path to allow imports from sibling directories
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -253,3 +257,65 @@ def save_chunks(pdf_path: str, chunks: List[Any], use_local: bool = False) -> in
         print(f"✓ Saved {len(chunks)} chunks to {output_path} (fallback)")
 
         return 0
+
+def get_all_documents(limit: Optional[int] = None) -> List[Dict[str, Any]]:
+    """
+    Fetch all documents from the database ordered by newest uploads first.
+    Args:
+        limit: Optional maximum number of rows to return (newest first).
+    Returns:
+        A list of dictionaries with document metadata. Returns an empty list
+        if no records exist or if the query fails.
+    """
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        base_query = """
+                    SELECT
+                        id,
+                        filename,
+                        file_path,
+                        file_size,
+                        total_pages,
+                        status,
+                        upload_date,
+                        processed_date,
+                        metadata
+                    FROM documents
+                    ORDER BY upload_date DESC
+                """
+        if limit is not None:
+            cursor.execute(base_query + " LIMIT %s;", (limit,))
+        else:
+            cursor.execute(base_query + ";")
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+    except Exception as exc:
+        print(f"Error fetching documents: {exc}")
+        return []
+    
+def remove_document(document_id: int) -> bool:
+    """Delete a document and its related chunks; also remove the uploaded file if possible."""
+    file_path = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        cursor.execute("SELECT file_path FROM documents WHERE id = %s;", (document_id,))
+        result = cursor.fetchone()
+        if not result:
+            return False
+        file_path = result[0]
+
+        cursor.execute("DELETE FROM documents WHERE id = %s;", (document_id,))
+        conn.commit()
+
+        if file_path and os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except OSError as exc:
+                print(f"Warning: failed to remove file '{file_path}': {exc}")
+
+        return True
+    except Exception as exc:
+        print(f"Error deleting document {document_id}: {exc}")
+        return False
