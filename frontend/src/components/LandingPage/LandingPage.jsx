@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { IoChatbubblesOutline, IoFlashOutline, IoDocumentTextOutline } from 'react-icons/io5';
 import Button from '../ui/Button';
 import Footer from '../Footer/Footer';
+import Logo from '../Chat/Logo';
 import './LandingPage.css';
 
 export default function LandingPage() {
@@ -29,7 +30,7 @@ export default function LandingPage() {
     <div className="landing-container">
       {/* Hero Section */}
       <div className="hero-section">
-        <h1 className="hero-title">A–Z Försäkringsassistent</h1>
+        <Logo onClick={() => navigate('/app')} />
         <p className="hero-description">
           Försäkringsinformation – på ett ögonblick<br />
           Kombinerar din expertis med intelligent AI<br />
