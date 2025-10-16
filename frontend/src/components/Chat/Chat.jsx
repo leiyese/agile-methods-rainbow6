@@ -66,14 +66,10 @@ export default function Chat() {
     <div className="chat-container">
       <div className="chat-header">
         <Logo />
+        <h2 className="chat-header-title">Hur kan jag hjälpa dig idag?</h2>
       </div>
 
       <div className="chat-messages">
-        {messages.length === 0 && (
-          <div className="welcome-message">
-            <p>Hej! Jag är din A-Z chatbot. Hur kan jag hjälpa dig idag?</p>
-          </div>
-        )}
 
         {messages.map((msg, index) => (
           <div key={index} className={`message ${msg.type}`}>

@@ -31,7 +31,7 @@ services:
       - /app/node_modules
     environment:
       - VITE_HOST=0.0.0.0
-      - VITE_API_URL=http://localhost:5000
+      - VITE_API_URL=http://localhost:5001
 
   postgres:
     image: pgvector/pgvector:pg15
