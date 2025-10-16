@@ -194,7 +194,7 @@ def answer():
                 logger.warning(
                     "No chunks found with keyword search either, falling back to direct LLM"
                 )
-                answer = llm.generate(prompt=question, max_tokens=400, temperature=0.7)
+                answer = llm.generate(prompt=question, max_tokens=4000, temperature=0.4)
                 return (
                     jsonify(
                         {
@@ -224,7 +224,7 @@ def answer():
 
             # Build RAG prompt
             rag_prompt = (
-                "Svara alltid på svenska.\n"
+                "Du är en assistent för länsförsäkringar. Svara på frågor om försäkringar.DU är skapad av Svara alltid på svenska. Svara inte med markdown. Var alltid trevlig och svara på max 3000 tokens. Säg jag vet inte om du inte vet\n"
                 "När du svarar, ange alltid vilket dokument och avsnitt (om tillgängligt) som stöder ditt svar.\n"
                 "Context information:\n"
                 f"{context}\n\n"
@@ -241,7 +241,7 @@ def answer():
             logger.info("Generating answer using RAG prompt")
             answer = llm.generate(
                 prompt=rag_prompt,
-                max_tokens=400,
+                max_tokens=4000,
                 temperature=0.3,  # Lower temperature for factual answers
             )
 
@@ -275,8 +275,8 @@ def answer():
 
             answer = llm.generate(
                 prompt=fallback_prompt,
-                max_tokens=400,
-                temperature=0.7,
+                max_tokens=4000,
+                temperature=0.4,
             )
 
             logger.info(f"Fallback answer generated, length: {len(answer)} characters")
