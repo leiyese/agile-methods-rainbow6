@@ -1,0 +1,33 @@
+name: Discord Notify
+
+on:
+  pull_request:
+    types: [opened]
+    branches: ["main", "dev"]
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build message
+        id: msg
+        run: |
+          cat > payload.json <<'JSON'
+          {
+            "content": null,
+            "embeds": [{
+              "title": "📝 New PR Opened in ${{ github.repository }}",
+              "description": "PR #${{ github.event.pull_request.number }}: **${{ github.event.pull_request.title }}**\nOpened by: **${{ github.actor }}**\nBranch: **${{ github.head_ref }}** into **${{ github.base_ref }}**\n\n${{ github.event.pull_request.body }}",
+              "url": "${{ github.event.pull_request.html_url }}",
+              "color": 5814783
+            }]
+          }
+          JSON
+          echo "Payload built"
+      - name: Send to Discord
+        run: |
+          curl -sS -X POST \
+            -H "Content-Type: application/json" \
+            -d @payload.json \
+            "${{ secrets.DISCORD_WEBHOOK }}"
