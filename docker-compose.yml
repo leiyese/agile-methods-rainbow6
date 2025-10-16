@@ -5,7 +5,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8001:8001"
+      - "5001:5000"
       - "5678:5678"  # Port for debugpy
     environment:
       - FLASK_DEBUG=1
@@ -14,8 +14,8 @@ services:
     volumes:
       - ./backend:/app
     working_dir: /app
-    #command: python -m flask --app src.app:create_app --debug run --host=0.0.0.0 --port=8001
-    command: python -m debugpy --listen 0.0.0.0:5678 -m flask --app src.app:create_app run --host=0.0.0.0 --port=8001
+    #command: python -m flask --app src.app:create_app --debug run --host=0.0.0.0 --port=5000
+    command: python -m debugpy --listen 0.0.0.0:5678 -m flask --app src.app:create_app run --host=0.0.0.0 --port=5000
     depends_on:
       postgres:
         condition: service_healthy  # Wait for postgres to be ready
@@ -31,7 +31,7 @@ services:
       - /app/node_modules
     environment:
       - VITE_HOST=0.0.0.0
-      - VITE_API_URL=http://localhost:8001
+      - VITE_API_URL=http://localhost:5001
 
   postgres:
     image: pgvector/pgvector:pg15
