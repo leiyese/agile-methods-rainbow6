@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 import time, uuid
 import json
 import logging
+import os
 from database.utils import search_similar_chunks, get_database_stats, test_connection
 
 # Set up logging
@@ -67,8 +68,19 @@ def answer():
             )
 
             # Step 2: Search for similar chunks in the database
-            match_threshold = 0.5  # Lower threshold to find more matches (was 0.6)
-            match_count = 5  # Increase number of chunks to retrieve (was 3)
+            # Read threshold/count from env or Flask config, with safe fallbacks
+            try:
+                match_threshold = float(
+                    os.getenv("MATCH_THRESHOLD", current_app.config.get("MATCH_THRESHOLD", 0.5))
+                )
+            except Exception:
+                match_threshold = 0.5
+            try:
+                match_count = int(
+                    os.getenv("MATCH_COUNT", current_app.config.get("MATCH_COUNT", 5))
+                )
+            except Exception:
+                match_count = 5
 
             logger.info(
                 f"Searching for similar chunks with threshold={match_threshold}, count={match_count}"
