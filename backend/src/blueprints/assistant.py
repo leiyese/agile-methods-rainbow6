@@ -275,6 +275,17 @@ def answer():
             logger.info(f"Answer generated, length: {len(answer)} characters")
             logger.info(f"Answer preview: {answer[:100]}...")
 
+            # Check if LLM says it doesn't know
+            answer_lower = answer.lower()
+            knows_answer = not any(phrase in answer_lower for phrase in [
+                "jag vet inte",
+                "vet inte",
+                "kan inte svara",
+                "hittar inte",
+                "finns inte",
+                "inte tillräcklig information"
+            ])
+            
             # Return RAG-enhanced response
             return (
                 jsonify(
@@ -293,7 +304,7 @@ def answer():
                                 "excerpt": chunk.get("content", "")[:150] + "..."
                             }
                             for i, chunk in enumerate(similar_chunks)
-                        ],
+                        ] if knows_answer else [],
                     }
                 ),
                 200,

@@ -4,7 +4,8 @@ export default function ChatInput({
   inputValue, 
   setInputValue, 
   isLoading, 
-  onSendMessage 
+  onSendMessage,
+  onInputFocus
 }) {
   const inputRef = useRef(null);
 
@@ -36,6 +37,7 @@ export default function ChatInput({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyPress={handleKeyPress}
+          onFocus={onInputFocus}
           placeholder="Skriv ditt meddelande här..."
           disabled={isLoading}
           className="chat-input"

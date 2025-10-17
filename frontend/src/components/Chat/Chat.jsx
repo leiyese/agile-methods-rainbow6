@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { askAssistant } from "../../api/assistantApi";
 import "./Chat.css";
 import ChatInput from "./ChatInput";
-import { askAssistant } from "../../api/assistantApi";
 import Logo from "./Logo";
 import { parseAnswer } from "../../api/response_handler";
 
@@ -28,11 +28,32 @@ export default function Chat() {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  // Close all sources when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if click is outside sources bubble
+      if (!event.target.closest('.sources-container')) {
+        setExpandedSources(new Set());
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const toggleSources = (index) => {
     setExpandedSources((prev) => {
       const s = new Set(prev);
-      if (s.has(index)) s.delete(index);
-      else s.add(index);
+      if (s.has(index)) {
+        // Close this bubble
+        s.delete(index);
+      } else {
+        // Close all other bubbles and open this one
+        s.clear();
+        s.add(index);
+      }
       return s;
     });
   };
@@ -40,6 +61,9 @@ export default function Chat() {
   const handleSendMessage = async (message) => {
     if (!message.trim()) return;
 
+    // Close any open sources bubbles
+    setExpandedSources(new Set());
+    
     setMessages((prev) => [...prev, { type: "user", content: message }]);
     setInputValue("");
     setIsLoading(true);
@@ -105,7 +129,7 @@ export default function Chat() {
                 {msg.sources &&
                   msg.sources.length > 0 &&
                   msg.type === "assistant" && (
-                    <>
+                    <div className="sources-container">
                       <div className="sources-toggle-row">
                         <button
                           type="button"
@@ -113,31 +137,41 @@ export default function Chat() {
                           aria-expanded={isExpanded}
                           onClick={() => toggleSources(index)}
                         >
-                          {isExpanded
-                            ? "Dölj källor"
-                            : `Visa källor (${msg.sources.length})`}
+                          {`Visa källor (${msg.sources.length})`}
                         </button>
                       </div>
-
-                      <div
-                        className={`sources ${
-                          isExpanded ? "expanded" : "collapsed"
-                        }`}
-                      >
-                        <h4 className="sources-title">Källor:</h4>
-
-                        {msg.sources.map((src, i) => (
-                          <div key={i} className="source-item">
-                            <span className="source-link plain">
-                              {src.document}
-                            </span>
-                            {src.section_title && (
-                              <span> — {src.section_title}</span>
-                            )}
+                      
+                      {isExpanded && (
+                        <div className="sources-bubble">
+                          <div className="sources-bubble-header">
+                            <h4 className="sources-bubble-title">Källor ({msg.sources.length})</h4>
+                            <button
+                              type="button"
+                              className="sources-bubble-close"
+                              onClick={() => toggleSources(index)}
+                              aria-label="Stäng källor"
+                            >
+                              ✕
+                            </button>
                           </div>
-                        ))}
-                      </div>
-                    </>
+                          <div className="sources-bubble-content">
+                            {msg.sources.map((src, i) => (
+                              <div key={i} className="source-item">
+                                <a
+                                  href={src.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="source-link"
+                                >
+                                  {src.document}
+                                </a>
+                                {src.section_title && <span className="source-section-title">{src.section_title}</span>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
               </div>
             </div>
@@ -168,6 +202,7 @@ export default function Chat() {
         setInputValue={setInputValue}
         isLoading={isLoading}
         onSendMessage={handleSendMessage}
+        onInputFocus={() => setExpandedSources(new Set())}
       />
     </div>
   );
