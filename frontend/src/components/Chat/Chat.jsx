@@ -8,6 +8,7 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [expandedSources, setExpandedSources] = useState(new Set());
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -17,6 +18,15 @@ export default function Chat() {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
+
+  const toggleSources = (index) => {
+    setExpandedSources((prev) => {
+      const s = new Set(prev);
+      if (s.has(index)) s.delete(index);
+      else s.add(index);
+      return s;
+    });
+  };
 
   const handleSendMessage = async (message) => {
     if (!message.trim()) return;
@@ -32,7 +42,7 @@ export default function Chat() {
         const assistantMessage = {
           type: "assistant",
           content: result.data.answer,
-          sources: result.data.sources || [], // 🟢 Fix: rättat "ources" till "sources"
+          sources: result.data.sources || [],
           metadata: {
             model: result.data.model_used,
             latency: result.data.latency_ms,
@@ -65,43 +75,68 @@ export default function Chat() {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        <Logo />
+        <Logo width={120} height={120} />
         <h2 className="chat-header-title">Hur kan jag hjälpa dig idag?</h2>
       </div>
 
       <div className="chat-messages">
+        {messages.map((msg, index) => {
+          const isExpanded = expandedSources.has(index);
 
-        {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg.type}`}>
-            <div className="message-content">
-              <strong className="sender">
-                {msg.type === "user" ? "Du" : "Assistent"}:
-              </strong>
-              <p>{msg.content}</p>
+          return (
+            <div key={index} className={`message ${msg.type}`}>
+              <div className="message-content">
+                <strong className="sender">
+                  {msg.type === "user" ? "Du" : "Assistent"}:
+                </strong>
+                <p>{msg.content}</p>
 
-              {/* 🟢 Visa källor om de finns */}
-              {msg.sources && msg.sources.length > 0 && msg.type === "assistant" && (
-                <div className="sources">
-                  <h4 className="sources-title">Källor:</h4>
-                  {msg.sources.map((src, i) => (
-                    <div key={i} className="source-item">
-                      <a
-                        href={src.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="source-link"
+                {msg.sources &&
+                  msg.sources.length > 0 &&
+                  msg.type === "assistant" && (
+                    <>
+                      <div className="sources-toggle-row">
+                        <button
+                          type="button"
+                          className="sources-toggle"
+                          aria-expanded={isExpanded}
+                          onClick={() => toggleSources(index)}
+                        >
+                          {isExpanded
+                            ? "Tryck här för att dölja källor källor"
+                            : `Tryck här för att visa källor (${msg.sources.length})`}
+                        </button>
+                      </div>
+
+                      <div
+                        className={`sources ${
+                          isExpanded ? "expanded" : "collapsed"
+                        }`}
                       >
-                        {src.document}
-                      </a>
-                      {src.section && <span> — {src.section}</span>}
-                      <p className="excerpt">{src.excerpt}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <h4 className="sources-title">Källor:</h4>
+                        {msg.sources.map((src, i) => (
+                          <div key={i} className="source-item">
+                            <a
+                              href={src.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="source-link"
+                            >
+                              {src.document}
+                            </a>
+                            {src.section && <span> — {src.section}</span>}
+                            {src.excerpt && (
+                              <p className="excerpt">{src.excerpt}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {isLoading && (
           <div className="message assistant loading">

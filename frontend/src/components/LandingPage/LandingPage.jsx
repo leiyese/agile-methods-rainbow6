@@ -30,7 +30,7 @@ export default function LandingPage() {
     <div className="landing-container">
       {/* Hero Section */}
       <div className="hero-section">
-        <Logo onClick={() => navigate('/app')} />
+        <Logo onClick={() => navigate('/app')} width={256} height={256} />
         <p className="hero-description">
           Försäkringsinformation – på ett ögonblick<br />
           Kombinerar din expertis med intelligent AI<br />
