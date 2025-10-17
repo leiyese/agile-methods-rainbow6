@@ -1,9 +1,20 @@
+import { useRef, useEffect } from "react";
+
 export default function ChatInput({ 
   inputValue, 
   setInputValue, 
   isLoading, 
   onSendMessage 
 }) {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    // Auto-focus on mount and when loading completes
+    if (!isLoading && inputRef.current) {
+      inputRef.current.focus({ preventScroll: true });
+    }
+  }, [isLoading]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     onSendMessage(inputValue);
@@ -20,6 +31,7 @@ export default function ChatInput({
     <form className="chat-input-container" onSubmit={handleSubmit}>
       <div className="input-wrapper">
         <input
+          ref={inputRef}
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -27,6 +39,7 @@ export default function ChatInput({
           placeholder="Skriv ditt meddelande här..."
           disabled={isLoading}
           className="chat-input"
+          autoFocus
         />
         <button
           type="submit"
