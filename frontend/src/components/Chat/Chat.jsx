@@ -165,10 +165,7 @@ export default function Chat() {
                                 >
                                   {src.document}
                                 </a>
-                                {src.section && <span> — {src.section}</span>}
-                                {src.excerpt && (
-                                  <p className="excerpt">{src.excerpt}</p>
-                                )}
+                                {src.section_title && <span className="source-section-title">{src.section_title}</span>}
                               </div>
                             ))}
                           </div>

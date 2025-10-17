@@ -595,6 +595,17 @@
   line-height: 1.4;
 }
 
+.source-section-title {
+  display: block;
+  font-size: 0.8rem;
+  color: #dd0303;
+  font-style: italic;
+  margin-top: 0.4rem;
+  margin-left: 0;
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
 /* Scrollbar for bubble */
 .sources-bubble-content::-webkit-scrollbar {
   width: 5px;
