@@ -3,6 +3,7 @@ import "./Chat.css";
 import ChatInput from "./ChatInput";
 import { askAssistant } from "../../api/assistantApi";
 import Logo from "./Logo";
+import { parseAnswer } from "../../api/response_handler";
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -36,17 +37,19 @@ export default function Chat() {
     setIsLoading(true);
 
     try {
-      const result = await askAssistant(message, false); // Set to true for mock mode
+      const result = await askAssistant(message, false);
 
       if (result.success) {
+        const parsed = parseAnswer(result.data || result);
+
         const assistantMessage = {
           type: "assistant",
-          content: result.data.answer,
-          sources: result.data.sources || [],
+          content: parsed.answer || result.data?.answer || "",
+          sources: parsed.sources || [],
           metadata: {
-            model: result.data.model_used,
-            latency: result.data.latency_ms,
-            traceId: result.data.trace_id,
+            model: result.data?.model_used || result.data?.model || null,
+            latency: result.data?.latency_ms ?? null,
+            traceId: result.data?.trace_id || null,
           },
         };
 
@@ -103,8 +106,8 @@ export default function Chat() {
                           onClick={() => toggleSources(index)}
                         >
                           {isExpanded
-                            ? "Tryck här för att dölja källor källor"
-                            : `Tryck här för att visa källor (${msg.sources.length})`}
+                            ? "Dölj källor"
+                            : `Visa källor (${msg.sources.length})`}
                         </button>
                       </div>
 
@@ -114,19 +117,14 @@ export default function Chat() {
                         }`}
                       >
                         <h4 className="sources-title">Källor:</h4>
+
                         {msg.sources.map((src, i) => (
                           <div key={i} className="source-item">
-                            <a
-                              href={src.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="source-link"
-                            >
+                            <span className="source-link plain">
                               {src.document}
-                            </a>
-                            {src.section && <span> — {src.section}</span>}
-                            {src.excerpt && (
-                              <p className="excerpt">{src.excerpt}</p>
+                            </span>
+                            {src.section_title && (
+                              <span> — {src.section_title}</span>
                             )}
                           </div>
                         ))}
