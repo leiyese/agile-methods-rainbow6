@@ -28,6 +28,7 @@ except ImportError:
     HAS_SPACY = False
     nlp = None
 
+
 def with_meta_header(text: str, section_code: str, section_title: str) -> str:
     """
     Liten helper som lägger rubriken först i chunken för bättre semantik i embeddings.
