@@ -6,7 +6,15 @@ import Logo from "./Logo";
 import { parseAnswer } from "../../api/response_handler";
 
 export default function Chat() {
-  const [messages, setMessages] = useState([]);
+  const initialMessages = [
+    {
+      type: "assistant",
+      content: "Ställ din fråga om olycksfallsförsäkringen",
+      sources: [],
+      metadata: {},
+    },
+  ];
+  const [messages, setMessages] = useState(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [expandedSources, setExpandedSources] = useState(new Set());
