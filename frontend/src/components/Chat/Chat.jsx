@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { askAssistant } from "../../api/assistantApi";
 import "./Chat.css";
 import ChatInput from "./ChatInput";
-import { askAssistant } from "../../api/assistantApi";
 import Logo from "./Logo";
 
 export default function Chat() {
@@ -94,7 +94,7 @@ export default function Chat() {
                 {msg.sources &&
                   msg.sources.length > 0 &&
                   msg.type === "assistant" && (
-                    <>
+                    <div className="sources-container">
                       <div className="sources-toggle-row">
                         <button
                           type="button"
@@ -102,36 +102,44 @@ export default function Chat() {
                           aria-expanded={isExpanded}
                           onClick={() => toggleSources(index)}
                         >
-                          {isExpanded
-                            ? "Tryck här för att dölja källor källor"
-                            : `Tryck här för att visa källor (${msg.sources.length})`}
+                          {`Visa källor (${msg.sources.length})`}
                         </button>
                       </div>
-
-                      <div
-                        className={`sources ${
-                          isExpanded ? "expanded" : "collapsed"
-                        }`}
-                      >
-                        <h4 className="sources-title">Källor:</h4>
-                        {msg.sources.map((src, i) => (
-                          <div key={i} className="source-item">
-                            <a
-                              href={src.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="source-link"
+                      
+                      {isExpanded && (
+                        <div className="sources-bubble">
+                          <div className="sources-bubble-header">
+                            <h4 className="sources-bubble-title">Källor ({msg.sources.length})</h4>
+                            <button
+                              type="button"
+                              className="sources-bubble-close"
+                              onClick={() => toggleSources(index)}
+                              aria-label="Stäng källor"
                             >
-                              {src.document}
-                            </a>
-                            {src.section && <span> — {src.section}</span>}
-                            {src.excerpt && (
-                              <p className="excerpt">{src.excerpt}</p>
-                            )}
+                              ✕
+                            </button>
                           </div>
-                        ))}
-                      </div>
-                    </>
+                          <div className="sources-bubble-content">
+                            {msg.sources.map((src, i) => (
+                              <div key={i} className="source-item">
+                                <a
+                                  href={src.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="source-link"
+                                >
+                                  {src.document}
+                                </a>
+                                {src.section && <span> — {src.section}</span>}
+                                {src.excerpt && (
+                                  <p className="excerpt">{src.excerpt}</p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
               </div>
             </div>
