@@ -46,8 +46,14 @@ export default function Chat() {
   const toggleSources = (index) => {
     setExpandedSources((prev) => {
       const s = new Set(prev);
-      if (s.has(index)) s.delete(index);
-      else s.add(index);
+      if (s.has(index)) {
+        // Close this bubble
+        s.delete(index);
+      } else {
+        // Close all other bubbles and open this one
+        s.clear();
+        s.add(index);
+      }
       return s;
     });
   };
