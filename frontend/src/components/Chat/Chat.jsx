@@ -3,9 +3,18 @@ import { askAssistant } from "../../api/assistantApi";
 import "./Chat.css";
 import ChatInput from "./ChatInput";
 import Logo from "./Logo";
+import { parseAnswer } from "../../api/response_handler";
 
 export default function Chat() {
-  const [messages, setMessages] = useState([]);
+  const initialMessages = [
+    {
+      type: "assistant",
+      content: "Ställ din fråga om olycksfallsförsäkringen",
+      sources: [],
+      metadata: {},
+    },
+  ];
+  const [messages, setMessages] = useState(initialMessages);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [expandedSources, setExpandedSources] = useState(new Set());
@@ -36,17 +45,19 @@ export default function Chat() {
     setIsLoading(true);
 
     try {
-      const result = await askAssistant(message, false); // Set to true for mock mode
+      const result = await askAssistant(message, false);
 
       if (result.success) {
+        const parsed = parseAnswer(result.data || result);
+
         const assistantMessage = {
           type: "assistant",
-          content: result.data.answer,
-          sources: result.data.sources || [],
+          content: parsed.answer || result.data?.answer || "",
+          sources: parsed.sources || [],
           metadata: {
-            model: result.data.model_used,
-            latency: result.data.latency_ms,
-            traceId: result.data.trace_id,
+            model: result.data?.model_used || result.data?.model || null,
+            latency: result.data?.latency_ms ?? null,
+            traceId: result.data?.trace_id || null,
           },
         };
 

@@ -8,6 +8,7 @@
   color: white;
   overflow: hidden;
   font-family: 'Poppins', sans-serif;
+  padding-bottom: 8rem;
 }
 
 .landing-container::before {
@@ -39,14 +40,14 @@
 .hero-section {
   text-align: center;
   max-width: 800px;
-  margin-bottom: 4rem;
+  margin-bottom: 0.75rem;
   animation: fadeInDown 0.8s ease-out;
 }
 
 .hero-section .logo {
-  width: 220px;
-  height: 220px;
-  margin-bottom: 0.5rem;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 0.25rem;
   filter: drop-shadow(-4px 4px 8px rgba(0, 0, 0, 0.4)) 
           drop-shadow(-2px 2px 4px rgba(0, 0, 0, 0.2))
           drop-shadow(2px -2px 6px rgba(255, 255, 255, 0.3));
@@ -74,9 +75,9 @@
 }
 
 .hero-description {
-  font-size: 1.3rem;
-  line-height: 1.6;
-  margin-bottom: 0.3rem;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin-bottom: 0.2rem;
   color: rgba(255, 255, 255, 0.95);
   font-weight: 600;
   max-width: 700px;
@@ -104,7 +105,7 @@
 
 /* Features Section */
 .features-section {
-  margin-bottom: 4rem;
+  margin-bottom: 4.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -311,6 +312,7 @@
 /* CTA Section */
 .cta-section {
   animation: fadeInUp 1s ease-out;
+  margin-bottom: 3rem;
 }
 
 /* CTA button styles now in Button.css */
@@ -349,6 +351,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .hero-section {
+    margin-bottom: 2rem;
+  }
+
   .hero-section .logo {
     width: 150px;
     height: 150px;
@@ -363,6 +369,7 @@
     gap: 1.5rem;
     font-size: 1rem;
     white-space: normal;
+    margin-bottom: 2rem;
   }
 
   .hero-subtitle {
@@ -385,7 +392,7 @@
 @media (max-width: 480px) {
 
   .hero-section {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
 
   .hero-section .logo {
@@ -399,7 +406,7 @@
   }
 
   .features-section {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     gap: 1rem;
   }
 
