@@ -28,6 +28,21 @@ export default function Chat() {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  // Close all sources when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if click is outside sources bubble
+      if (!event.target.closest('.sources-container')) {
+        setExpandedSources(new Set());
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   const toggleSources = (index) => {
     setExpandedSources((prev) => {
       const s = new Set(prev);
@@ -40,6 +55,9 @@ export default function Chat() {
   const handleSendMessage = async (message) => {
     if (!message.trim()) return;
 
+    // Close any open sources bubbles
+    setExpandedSources(new Set());
+    
     setMessages((prev) => [...prev, { type: "user", content: message }]);
     setInputValue("");
     setIsLoading(true);
@@ -181,6 +199,7 @@ export default function Chat() {
         setInputValue={setInputValue}
         isLoading={isLoading}
         onSendMessage={handleSendMessage}
+        onInputFocus={() => setExpandedSources(new Set())}
       />
     </div>
   );
