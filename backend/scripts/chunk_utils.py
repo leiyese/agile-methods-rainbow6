@@ -52,6 +52,30 @@ except Exception:
         words = len(re.findall(r"\w+", text or ""))
         return max(1, int(words * 4 / 3))
 
+def with_meta_header(text: str, section_code: str, section_title: str) -> str:
+    """
+    Liten helper som lägger rubriken först i chunken för bättre semantik i embeddings.
+    Anropa frivilligt där ni skapar chunk-content:
+        content = with_meta_header(content, code, title)
+    """
+    header = f"[{section_code} {section_title}]".strip()
+    return f"{header}\n{text}".strip()
+
+
+# --- Token counter (tiktoken om finns, annars fallback) ---
+try:
+    import tiktoken
+    _enc = tiktoken.get_encoding("cl100k_base")
+
+    def approx_token_count(text: str) -> int:
+        # Mer korrekt token-antal när tiktoken finns
+        return len(_enc.encode(text or ""))
+except Exception:
+    def approx_token_count(text: str) -> int:
+        # Enkel fallback: ~1 token ≈ 0.75 ord
+        words = len(re.findall(r"\w+", text or ""))
+        return max(1, int(words * 4 / 3))
+
 def extract_sections(text: str) -> List[Dict[str, Any]]:
     """
     Extract sections from text based on section headers
