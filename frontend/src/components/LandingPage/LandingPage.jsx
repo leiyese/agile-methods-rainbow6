@@ -39,113 +39,22 @@ export default function LandingPage() {
         </p>
       </div>
 
-      {/* Features Section */}
-      <div className="features-section">
-        {/* First Flip Card - Natural Conversation */}
-        <div className="wrapper">
-          <div className="flip-container">
-            <div className="flip flip-left">
-              <div className="front front-left">
-                <div className="circle">
-                  <IoChatbubblesOutline className="flip-icon" />
-                </div>
-              </div>
-              <div className="back back-left">
-                <div className="flip-text flip-text-combined">
-                  <h3>Naturlig Konversation</h3>
-                  <p>Prata som med en människa. Inga komplicerade kommandon eller tekniska termer behövs.</p>
-                </div>
-              </div>
-            </div>
-          </div><div className="flip-container">
-            <div className="flip flip-right">
-              <div className="front front-right">
-                <div className="circle">
-                  <IoChatbubblesOutline className="flip-icon" />
-                </div>
-              </div>
-              <div className="back back-right">
-                <div className="flip-text flip-text-combined flip-text-right">
-                  <h3>Naturlig Konversation</h3>
-                  <p>Prata som med en människa. Inga komplicerade kommandon eller tekniska termer behövs.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Second Flip Card - Fast Answers */}
-        <div className="wrapper">
-          <div className="flip-container">
-            <div className="flip flip-left">
-              <div className="front front-left">
-                <div className="circle">
-                  <IoFlashOutline className="flip-icon" />
-                </div>
-              </div>
-              <div className="back back-left">
-                <div className="flip-text flip-text-combined">
-                  <h3>Snabba Svar</h3>
-                  <p>Få svar på sekunder istället för att läsa genom långa dokument. AI:n sammanfattar informationen åt dig.</p>
-                </div>
-              </div>
-            </div>
-          </div><div className="flip-container">
-            <div className="flip flip-right">
-              <div className="front front-right">
-                <div className="circle">
-                  <IoFlashOutline className="flip-icon" />
-                </div>
-              </div>
-              <div className="back back-right">
-                <div className="flip-text flip-text-combined flip-text-right">
-                  <h3>Snabba Svar</h3>
-                  <p>Få svar på sekunder istället för att läsa genom långa dokument. AI:n sammanfattar informationen åt dig.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Third Flip Card - Document Knowledge */}
-        <div className="wrapper">
-          <div className="flip-container">
-            <div className="flip flip-left">
-              <div className="front front-left">
-                <div className="circle">
-                  <IoDocumentTextOutline className="flip-icon" />
-                </div>
-              </div>
-              <div className="back back-left">
-                <div className="flip-text flip-text-combined">
-                  <h3>Dokumentkunskap</h3>
-                  <p>Alla svar baseras på riktiga försäkringsdokument. AI:n anger alltid källa och avsnitt för transparens.</p>
-                </div>
-              </div>
-            </div>
-          </div><div className="flip-container">
-            <div className="flip flip-right">
-              <div className="front front-right">
-                <div className="circle">
-                  <IoDocumentTextOutline className="flip-icon" />
-                </div>
-              </div>
-              <div className="back back-right">
-                <div className="flip-text flip-text-combined flip-text-right">
-                  <h3>Dokumentkunskap</h3>
-                  <p>Alla svar baseras på riktiga försäkringsdokument. AI:n anger alltid källa och avsnitt för transparens.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* CTA Button */}
       <div className="cta-section">
         <Button onClick={() => navigate('/app')}>
           Kom igång nu →
         </Button>
+      </div>
+
+      {/* Features Section */}
+      <div className="features-section">
+        {features.map((feature) => (
+          <div key={feature.title} className="feature-card">
+            <div className="feature-icon">{feature.icon}</div>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
+          </div>
+        ))}
       </div>
       
       <Footer />
