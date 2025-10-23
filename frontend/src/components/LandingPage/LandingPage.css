@@ -1,0 +1,421 @@
+.landing-container {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+  font-family: 'Poppins', sans-serif;
+  padding-bottom: 8rem;
+}
+
+.landing-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("https://res.cloudinary.com/dh4nepzch/image/upload/v1760255026/city_scape_tybiar.jpg") center top no-repeat;
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.85;
+  z-index: -2;
+}
+
+.landing-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(0, 59, 137, 0.7) 100%);
+  z-index: -1;
+}
+
+/* Hero Section */
+.hero-section {
+  text-align: center;
+  max-width: 800px;
+  margin-bottom: 0.75rem;
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.hero-section .logo {
+  width: 160px;
+  height: 160px;
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(-4px 4px 8px rgba(0, 0, 0, 0.4)) 
+          drop-shadow(-2px 2px 4px rgba(0, 0, 0, 0.2))
+          drop-shadow(2px -2px 6px rgba(255, 255, 255, 0.3));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.hero-section .logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(-5px 5px 10px rgba(0, 0, 0, 0.5)) 
+          drop-shadow(-3px 3px 6px rgba(0, 0, 0, 0.3))
+          drop-shadow(3px -3px 8px rgba(255, 255, 255, 0.4));
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1.25rem;
+  color: #ffffff;
+  text-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(33, 150, 243, 0.3),
+    0 0 50px rgba(33, 150, 243, 0.2);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  line-height: 1.4;
+  margin-bottom: 0.2rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: 
+    0 2px 15px rgba(0, 0, 0, 0.3),
+    0 0 25px rgba(33, 150, 243, 0.3),
+    0 0 40px rgba(33, 150, 243, 0.2);
+}
+
+.hero-description:last-of-type {
+  margin-bottom: 0;
+  margin-bottom: 0.75rem;
+  color: #ffffff;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: #ffffff;
+  opacity: 0.85;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+/* Features Section */
+.features-section {
+  margin-bottom: 4.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.wrapper {
+  display: inline-block;
+  background: linear-gradient(145deg, #0277BD, #01579B);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 6px 10px rgba(0,0,0,0.2);
+  border-radius: 0;
+  position: relative;
+}
+
+.wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 0;
+  pointer-events: none;
+}
+
+/* entire container, keeps perspective */
+.flip-container {
+  display: inline-block;
+  perspective: 1000px;
+  vertical-align: top; /* Prevent unwanted margin. */
+  font-size: 1rem;
+}
+
+/* flip the pane when hovered */
+.wrapper:hover .flip-left {
+  transform: rotateY(-180deg);
+}
+
+.wrapper:hover .flip-right {
+  transform: rotateY(180deg);
+}
+
+.flip-container,
+.front,
+.back {
+  width: 180px;
+  height: 240px;
+}
+
+/* flip speed goes here */
+.flip {
+  transition: 0.6s;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+/* hide back of pane during swap */
+.front,
+.back {
+  backface-visibility: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* front pane, placed above back */
+.front {
+  z-index: 2;
+  background: linear-gradient(145deg, #42A5F5, #2196F3);
+  transform: rotateY(0deg);
+  overflow: hidden;
+  position: relative;
+}
+
+.front::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+}
+
+.front-left {
+  border-radius: 0;
+}
+
+.front-left::before {
+  border-radius: 0;
+}
+
+.front-right {
+  border-radius: 0;
+}
+
+.front-right::before {
+  border-radius: 0;
+}
+
+.front-left .circle {
+  position: absolute;
+  right: -50px;
+  top: 50%;
+  margin-top: -50px;
+}
+
+.front-right .circle {
+  position: absolute;
+  left: -50px;
+  top: 50%;
+  margin-top: -50px;
+}
+
+.circle {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  background: #ffffff;
+  box-shadow: 0 19px 38px rgba(0,0,0,0.20), 0 15px 12px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flip-icon {
+  font-size: 3rem;
+  color: #D62220;
+}
+
+/* back, initially hidden pane */
+.back {
+  background: #ffffff;
+  transform: rotateY(180deg);
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.back-left {
+  border-radius: 0;
+}
+
+.back-right {
+  border-radius: 0;
+}
+
+.features-section img {
+  width: 360px;
+  height: 240px;
+}
+
+.back-left img {
+  position: absolute;
+  left: 0;
+}
+
+.back-right img {
+  position: absolute;
+  right: 0;
+}
+
+.flip-text {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  text-align: center;
+  color: #003b89;
+}
+
+.flip-text-combined {
+  position: absolute;
+  width: 360px;
+  height: 240px;
+  left: 0;
+  top: 0;
+  padding: 2rem;
+}
+
+.flip-text-right {
+  left: -180px;
+}
+
+.flip-text h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #003b89;
+}
+
+.flip-text p {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #01579B;
+}
+
+/* CTA Section */
+.cta-section {
+  animation: fadeInUp 1s ease-out;
+  margin-bottom: 3rem;
+}
+
+/* CTA button styles now in Button.css */
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-section {
+    margin-bottom: 2rem;
+  }
+
+  .hero-section .logo {
+    width: 150px;
+    height: 150px;
+  }
+
+  .hero-description {
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+
+  .features-section {
+    gap: 1.5rem;
+    font-size: 1rem;
+    white-space: normal;
+    margin-bottom: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .features-section {
+    gap: 1.5rem;
+  }
+
+  .wrapper {
+    transform: scale(0.9);
+  }
+
+  .wrapper {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 480px) {
+
+  .hero-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-section .logo {
+    width: 120px;
+    height: 120px;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .features-section {
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .wrapper {
+    transform: scale(0.85);
+  }
+
+  .btn {
+    font-size: 1rem;
+    padding: 0.875rem 2rem;
+  }
+}

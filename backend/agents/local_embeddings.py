@@ -152,7 +152,7 @@ class LocalLLM:
         """Generate embeddings using local model"""
         return self.embedder.embed(texts)
     
-    def generate(self, prompt: str, max_tokens: int = 400, temperature: float = 0.0) -> str:
+    def generate(self, prompt: str, max_tokens: int = 400, temperature: float = 0.4) -> str:
         """
         Text generation (requires Gemini API)
         

@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, current_app
 import time, uuid
 import json
 import logging
+import os
 from database.utils import search_similar_chunks, get_database_stats, test_connection
 
 # Set up logging
@@ -67,8 +68,19 @@ def answer():
             )
 
             # Step 2: Search for similar chunks in the database
-            match_threshold = 0.5  # Lower threshold to find more matches (was 0.6)
-            match_count = 5  # Increase number of chunks to retrieve (was 3)
+            # Read threshold/count from env or Flask config, with safe fallbacks
+            try:
+                match_threshold = float(
+                    os.getenv("MATCH_THRESHOLD", current_app.config.get("MATCH_THRESHOLD", 0.5))
+                )
+            except Exception:
+                match_threshold = 0.5
+            try:
+                match_count = int(
+                    os.getenv("MATCH_COUNT", current_app.config.get("MATCH_COUNT", 5))
+                )
+            except Exception:
+                match_count = 5
 
             logger.info(
                 f"Searching for similar chunks with threshold={match_threshold}, count={match_count}"
@@ -194,15 +206,23 @@ def answer():
                 logger.warning(
                     "No chunks found with keyword search either, falling back to direct LLM"
                 )
-                answer = llm.generate(prompt=question, max_tokens=400, temperature=0.7)
+                answer = llm.generate(prompt=question, max_tokens=4000, temperature=0.4)
                 return (
                     jsonify(
                         {
-                            "answer": answer,
+                            "answer": f"**Svar:**\n\n{answer.strip()}\n\n---\n\n _Genererat av {llm.gen_model}_",
+                            "formatted": True,
                             "model_used": llm.gen_model,
                             "rag_enabled": False,
                             "latency_ms": int((time.time() - t0) * 1000),
                             "trace_id": trace_id,
+                            "sources": [
+                                {
+                                    "id": c.get("document_id"),
+                                    "excerpt": c.get("content", "")[:150] + "...",
+                                }
+                                for c in similar_chunks
+                            ],
                         }
                     ),
                     200,
@@ -213,18 +233,24 @@ def answer():
             # Format retrieved chunks as context
             context_parts = []
             for i, chunk in enumerate(similar_chunks, 1):
-                doc_name = chunk.get("filename", f"Document {i}")
-                section = chunk.get("section") or chunk.get("section_title") or ""
-                label = f"{doc_name}"
-                if section:
-                    label += f" ({section})"
+                doc_name = chunk.get("filename") or f"Dokument {i}"
+                section = chunk.get("section") or chunk.get("section_title") or "Okänt avsnitt"
+                page_number = chunk.get("page_number") or "Okänd sida"
+                date = chunk.get("date") or "Okänt datum"
+                link = chunk.get("link")
+
+                # Chunks without page numbers for now
+                label = f"{doc_name} (Avsnitt: {section}, Sida: {page_number}, Datum: {date})"
+                if link:
+                    label = f"[{label}]({link})"
+
                 # Remove page number from label since we don´t have that working yet in the ingestion process
-                context_parts.append(f"[{label}] {chunk['content']}")
+                context_parts.append(f"{label}\n{chunk.get('content', '')}")
             context = "\n\n".join(context_parts)
 
             # Build RAG prompt
             rag_prompt = (
-                "Svara alltid på svenska.\n"
+                "Du är en assistent för länsförsäkringar. Svara på frågor om försäkringar.DU är skapad av Svara alltid på svenska. Svara inte med markdown. Var alltid trevlig och svara på max 3000 tokens. Säg jag vet inte om du inte vet\n"
                 "När du svarar, ange alltid vilket dokument och avsnitt (om tillgängligt) som stöder ditt svar.\n"
                 "Context information:\n"
                 f"{context}\n\n"
@@ -241,7 +267,7 @@ def answer():
             logger.info("Generating answer using RAG prompt")
             answer = llm.generate(
                 prompt=rag_prompt,
-                max_tokens=400,
+                max_tokens=4000,
                 temperature=0.3,  # Lower temperature for factual answers
             )
 
@@ -249,6 +275,17 @@ def answer():
             logger.info(f"Answer generated, length: {len(answer)} characters")
             logger.info(f"Answer preview: {answer[:100]}...")
 
+            # Check if LLM says it doesn't know
+            answer_lower = answer.lower()
+            knows_answer = not any(phrase in answer_lower for phrase in [
+                "jag vet inte",
+                "vet inte",
+                "kan inte svara",
+                "hittar inte",
+                "finns inte",
+                "inte tillräcklig information"
+            ])
+            
             # Return RAG-enhanced response
             return (
                 jsonify(
@@ -259,6 +296,15 @@ def answer():
                         "context_count": len(similar_chunks),
                         "latency_ms": int((time.time() - t0) * 1000),
                         "trace_id": trace_id,
+                        "sources": [
+                            {
+                                "document": chunk.get("filename", f"Dokument {i+1}"),
+                                "section": chunk.get("section") or chunk.get("section_title") or None,
+                                "link": chunk.get("link"),
+                                "excerpt": chunk.get("content", "")[:150] + "..."
+                            }
+                            for i, chunk in enumerate(similar_chunks)
+                        ] if knows_answer else [],
                     }
                 ),
                 200,
@@ -275,8 +321,8 @@ def answer():
 
             answer = llm.generate(
                 prompt=fallback_prompt,
-                max_tokens=400,
-                temperature=0.7,
+                max_tokens=4000,
+                temperature=0.4,
             )
 
             logger.info(f"Fallback answer generated, length: {len(answer)} characters")
@@ -301,11 +347,11 @@ def answer():
         return (
             jsonify(
                 {
-                    "error": "InternalServerError",
-                    "message": "Failed to generate response",
+                    "error": "ServiceUnavailable",
+                    "message": "Modellen är tillfälligt överbelastad. Försök igen om en stund.",
                 }
             ),
-            500,
+            503,
         )
 
 

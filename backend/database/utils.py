@@ -247,21 +247,34 @@ def search_similar_chunks(query_embedding, match_threshold=0.5, match_count=5):
         match_count: Number of results to return
 
     Returns:
-        List of matching chunks with metadata
+        List of matching chunks with metadata, including document links
     """
     try:
         with get_db_connection() as conn:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
+
             # Convert embedding to pgvector string format
             embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
+
             cursor.execute(
                 """
                 SELECT * FROM search_similar_chunks(%s::vector, %s, %s);
-            """,
+                """,
                 (embedding_str, match_threshold, match_count),
             )
+
             results = cursor.fetchall()
-            return [dict(row) for row in results]
+            chunks = [dict(row) for row in results]
+
+            for chunk in chunks:
+                document_id = chunk.get("document_id")
+                chunk_index = chunk.get("chunk_index")
+
+                if document_id is not None and chunk_index is not None:
+                    chunk["link"] = f"https://dinapp.se/docs/{document_id}?highlight={chunk_index}"
+
+            return chunks
+
     except Exception as e:
         print(f"Error searching chunks: {e}")
         return []
