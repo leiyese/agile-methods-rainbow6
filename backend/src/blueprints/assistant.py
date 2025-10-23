@@ -233,7 +233,8 @@ def answer():
             # Format retrieved chunks as context
             context_parts = []
             for i, chunk in enumerate(similar_chunks, 1):
-                doc_name = chunk.get("filename") or f"Dokument {i}"
+                # Use title if available, otherwise fall back to filename
+                doc_name = chunk.get("title") or chunk.get("filename") or f"Dokument {i}"
                 
                 # Use section_code and section_title from metadata
                 section_code = chunk.get("section_code", "")
@@ -325,8 +326,11 @@ def answer():
                         "trace_id": trace_id,
                         "sources": [
                             {
-                                "document": chunk.get("filename", f"Dokument {i+1}"),
-                                "section": chunk.get("section") or chunk.get("section_title") or None,
+                                "document": chunk.get("title") or chunk.get("filename", f"Dokument {i+1}"),
+                                "section": chunk.get("section_code") or chunk.get("section_title") or None,
+                                "section_title": chunk.get("section_title") or None,
+                                "page_start": chunk.get("page_start"),
+                                "page_end": chunk.get("page_end"),
                                 "link": chunk.get("link"),
                                 "excerpt": chunk.get("content", "")[:150] + "..."
                             }
