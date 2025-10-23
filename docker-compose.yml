@@ -10,7 +10,10 @@ services:
     environment:
       - FLASK_DEBUG=1
       - PYTHONPATH=/app
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - DB_HOST=${DB_HOST:-postgres}
+      - DB_PORT=${DB_PORT:-5432}
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - PGSSLMODE=${PGSSLMODE:-disable}
     volumes:
       - ./backend:/app
     working_dir: /app
