@@ -155,19 +155,41 @@ export default function Chat() {
                             </button>
                           </div>
                           <div className="sources-bubble-content">
-                            {msg.sources.map((src, i) => (
-                              <div key={i} className="source-item">
-                                <a
-                                  href={src.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="source-link"
-                                >
-                                  {src.document}
-                                </a>
-                                {src.section_title && <span className="source-section-title">{src.section_title}</span>}
-                              </div>
-                            ))}
+                            {msg.sources.map((src, i) => {
+                              // Format page information
+                              let pageInfo = '';
+                              if (src.page_start && src.page_start > 0) {
+                                if (src.page_end && src.page_end !== src.page_start) {
+                                  pageInfo = `Sida ${src.page_start}-${src.page_end}`;
+                                } else {
+                                  pageInfo = `Sida ${src.page_start}`;
+                                }
+                              }
+                              
+                              return (
+                                <div key={i} className="source-item">
+                                  <div className="source-title">
+                                    {src.link ? (
+                                      <a
+                                        href={src.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="source-link"
+                                      >
+                                        {src.document}
+                                        <span className="external-link-icon">↗</span>
+                                      </a>
+                                    ) : (
+                                      <span className="source-title-text">{src.document}</span>
+                                    )}
+                                  </div>
+                                  <div className="source-metadata">
+                                    {src.section_title && <span className="source-section-title">{src.section_title}</span>}
+                                    {pageInfo && <span className="source-page-info">{pageInfo}</span>}
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
