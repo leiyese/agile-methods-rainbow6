@@ -256,11 +256,46 @@ def search_similar_chunks(query_embedding, match_threshold=0.5, match_count=5):
             # Convert embedding to pgvector string format
             embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
 
+            # Enhanced query that includes rich metadata from documents table
             cursor.execute(
                 """
-                SELECT * FROM search_similar_chunks(%s::vector, %s, %s);
+                SELECT 
+                    dc.id,
+                    dc.document_id,
+                    dc.chunk_index,
+                    d.filename,
+                    dc.page_number,
+                    dc.content,
+                    1 - (dc.embedding <=> %s::vector) as similarity,
+                    d.metadata->>'effective_date' as date,
+                    d.metadata->>'title' as title,
+                    d.metadata->>'source_url' as source_url,
+                    d.upload_date,
+                    d.total_pages,
+                    -- Extract chunk-specific metadata from the chunks_metadata object (string keys)
+                    COALESCE(
+                        (d.metadata->'chunks_metadata'->(dc.chunk_index::text)->>'section_code'), 
+                        ''
+                    ) as section_code,
+                    COALESCE(
+                        (d.metadata->'chunks_metadata'->(dc.chunk_index::text)->>'section_title'), 
+                        ''
+                    ) as section_title,
+                    COALESCE(
+                        (d.metadata->'chunks_metadata'->(dc.chunk_index::text)->>'page_start')::int, 
+                        dc.page_number
+                    ) as page_start,
+                    COALESCE(
+                        (d.metadata->'chunks_metadata'->(dc.chunk_index::text)->>'page_end')::int, 
+                        dc.page_number
+                    ) as page_end
+                FROM document_chunks dc
+                JOIN documents d ON dc.document_id = d.id
+                WHERE 1 - (dc.embedding <=> %s::vector) > %s
+                ORDER BY dc.embedding <=> %s::vector
+                LIMIT %s;
                 """,
-                (embedding_str, match_threshold, match_count),
+                (embedding_str, embedding_str, match_threshold, embedding_str, match_count),
             )
 
             results = cursor.fetchall()
@@ -269,9 +304,20 @@ def search_similar_chunks(query_embedding, match_threshold=0.5, match_count=5):
             for chunk in chunks:
                 document_id = chunk.get("document_id")
                 chunk_index = chunk.get("chunk_index")
+                source_url = chunk.get("source_url")
 
-                if document_id is not None and chunk_index is not None:
+                # Use source_url if available, otherwise fall back to default link
+                if source_url:
+                    chunk["link"] = source_url
+                elif document_id is not None and chunk_index is not None:
                     chunk["link"] = f"https://dinapp.se/docs/{document_id}?highlight={chunk_index}"
+                
+                # Add additional metadata fields for compatibility
+                chunk["section"] = chunk.get("section_title", "")
+                
+                # Use the metadata page numbers if available, otherwise fall back to chunk page_number
+                if chunk.get("page_start") and chunk.get("page_start") > 0:
+                    chunk["page_number"] = chunk.get("page_start")
 
             return chunks
 

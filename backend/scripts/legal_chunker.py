@@ -91,7 +91,7 @@ class LegalDocumentChunker:
             text_parts = []
             for page_num, page in enumerate(reader.pages, 1):
                 text = page.extract_text()
-                if text.strip():
+                if text and text.strip():
                     text_parts.append(f"[Page {page_num}]\n{text}")
             
             full_text = "\n\n".join(text_parts)
@@ -118,13 +118,8 @@ class LegalDocumentChunker:
     
     def extract_page_numbers(self, text: str) -> Tuple[int, int]:
         """
-        Extract start and end page numbers from chunk text
-        
-        Args:
-            text: Text chunk that may contain [Page X] markers
-            
-        Returns:
-            Tuple of (start_page, end_page)
+        Extract start and end page numbers from chunk text by looking for explicit
+        [Page X] markers. If none are found in the chunk, callers may override later.
         """
         page_matches = list(self.page_pattern.finditer(text))
         if not page_matches:
@@ -135,37 +130,20 @@ class LegalDocumentChunker:
         return start_page, end_page
     
     def extract_section_code(self, text: str) -> Tuple[str, str]:
-        """
-        Extract section code and title from text
-        
-        Args:
-            text: Text that may contain section markers like "A.1 Försäkringsgivare"
-            
-        Returns:
-            Tuple of (section_code, section_title)
-        """
+        """Extract section code and title from text"""
         match = self.section_pattern.search(text)
         if match:
             return match.group(1), match.group(2)
         return "", ""
     
     def detect_content_type(self, text: str) -> Dict[str, Any]:
-        """
-        Detect content types and features in text
-        
-        Args:
-            text: Text to analyze
-            
-        Returns:
-            Dictionary with content type flags
-        """
+        """Detect content types and features in text"""
         result = {
             'has_table': bool(self.table_pattern.search(text)),
             'has_list': bool(self.list_pattern.search(text)),
             'icd_codes': self.icd_pattern.findall(text)
         }
         
-        # Determine if text is about eligibility or limitations
         lower_text = text.lower()
         result['eligibility'] = any(term in lower_text for term in [
             "ersätter", "ersättning", "rätt till", "omfattar"
@@ -174,7 +152,6 @@ class LegalDocumentChunker:
             "ersätter inte", "begränsning", "undantag", "gäller inte"
         ])
         
-        # Try to determine what the text applies to
         if "olycksfall" in lower_text and "sjukdom" in lower_text:
             result['applies_to'] = "båda"
         elif "olycksfall" in lower_text:
@@ -187,16 +164,7 @@ class LegalDocumentChunker:
         return result
     
     def _extract_keywords_simple(self, text: str, max_tags: int = 5) -> List[str]:
-        """
-        Simple keyword extraction without NLP
-        
-        Args:
-            text: Text to analyze
-            max_tags: Maximum number of tags to extract
-            
-        Returns:
-            List of topic tags
-        """
+        """Simple keyword extraction without NLP"""
         keywords = {
             "invaliditet": ["invalid", "invaliditet"],
             "ersättning": ["ersätt", "ersättning"],
@@ -212,30 +180,15 @@ class LegalDocumentChunker:
         for tag, terms in keywords.items():
             if any(term in text.lower() for term in terms):
                 tags.append(tag)
-                
-        # Also try to find section codes as tags
         section_code, _ = self.extract_section_code(text)
         if section_code:
             tags.append(section_code.lower())
-            
         return tags[:max_tags]
     
     def extract_topic_tags(self, text: str, max_tags: int = 5) -> List[str]:
-        """
-        Extract key topic tags from text using NLP
-        
-        Args:
-            text: Text to analyze
-            max_tags: Maximum number of tags to extract
-            
-        Returns:
-            List of topic tags
-        """
+        """Extract key topic tags from text using NLP (fallbacks to simple)"""
         if not HAS_SPACY:
-            # Fallback without spaCy - simple keyword extraction
             return self._extract_keywords_simple(text, max_tags)
-        
-        # Use spaCy for better NLP-based extraction
         try:
             from scripts.chunk_utils import nlp
             if nlp is None:
@@ -243,30 +196,15 @@ class LegalDocumentChunker:
             doc = nlp(text[:10000])  # Limit text length for processing speed
         except (ImportError, AttributeError) as e:
             print(f"Warning: Could not use spaCy for NLP: {e}")
-            # Fall back to simple keyword extraction
             return self._extract_keywords_simple(text, max_tags)
-        
-        # Extract nouns and named entities as potential tags
         potential_tags = []
-        
-        # Add named entities
         for ent in doc.ents:
             if ent.label_ in ["ORG", "PRODUCT", "LAW", "MONEY"]:
                 potential_tags.append(ent.text.lower())
-        
-        # Add noun chunks and filter by frequency
-        noun_chunks = [chunk.text.lower() for chunk in doc.noun_chunks 
-                      if len(chunk.text) > 3]
-        
-        # Count frequencies
+        noun_chunks = [chunk.text.lower() for chunk in doc.noun_chunks if len(chunk.text) > 3]
         from collections import Counter
         tag_counter = Counter(noun_chunks)
-        
-        # Get most common tags
         common_tags = [tag for tag, _ in tag_counter.most_common(max_tags)]
-        
-        # Add manual tags based on keywords
-        manual_tags = []
         keywords = {
             "invaliditet": ["invalid", "invaliditet"],
             "ersättning": ["ersätt", "ersättning"],
@@ -277,38 +215,20 @@ class LegalDocumentChunker:
             "självrisk": ["självrisk"],
             "undantag": ["undantag", "begränsning"],
         }
-        
+        manual_tags = []
         for tag, terms in keywords.items():
             if any(term in text.lower() for term in terms):
                 manual_tags.append(tag)
-                
-        # Combine and deduplicate tags
         all_tags = list(set(common_tags + manual_tags + potential_tags))
-        
-        # Limit to max_tags
         return all_tags[:max_tags]
         
     def identify_tables(self, text: str) -> List[Tuple[int, int]]:
-        """
-        Identify table regions in text
-        
-        Args:
-            text: Text to analyze
-            
-        Returns:
-            List of (start, end) indices for table regions
-        """
-        # This is a simplified approach - in a real implementation, you'd need
-        # more sophisticated table detection based on layout analysis
-        
+        """Identify table regions in text"""
         lines = text.split('\n')
         table_regions = []
         in_table = False
         table_start = 0
-        
         for i, line in enumerate(lines):
-            # Simple heuristic: consecutive lines with multiple spaces or tabs
-            # and similar structure might be table rows
             if '  ' in line or '\t' in line:
                 if not in_table:
                     in_table = True
@@ -316,227 +236,160 @@ class LegalDocumentChunker:
             elif in_table:
                 in_table = False
                 table_regions.append((table_start, i))
-                
-        # Handle case where table is at the end of text
         if in_table:
             table_regions.append((table_start, len(lines)))
-            
         return table_regions
     
     def split_by_section(self, text: str) -> List[str]:
-        """
-        Split text by major sections (A-F) and subsections
+        """Split text into subsections based on section patterns"""
+        # Look for subsection patterns like A.1.1, A.1.2, etc.
+        subsection_pattern = re.compile(r'([A-F]\.[\d\.]+)\s+', re.MULTILINE)
+        matches = list(subsection_pattern.finditer(text))
         
-        Args:
-            text: Full document text
-            
-        Returns:
-            List of section texts
-        """
-        # Find all section headers
-        section_matches = list(self.section_pattern.finditer(text))
-        
-        if not section_matches:
-            # No sections found, return whole text as one chunk
+        if len(matches) <= 1:
+            # No clear subsections found, return original text
             return [text]
         
         sections = []
-        
-        # Process each section
-        for i, match in enumerate(section_matches):
+        for i, match in enumerate(matches):
             start_pos = match.start()
-            
-            # Determine end position (start of next section or end of text)
-            if i < len(section_matches) - 1:
-                end_pos = section_matches[i + 1].start()
+            end_pos = matches[i + 1].start() if i < len(matches) - 1 else len(text)
+            section_text = text[start_pos:end_pos].strip()
+            if section_text:
+                sections.append(section_text)
+        
+        return sections if sections else [text]
+    
+    def _last_page_before(self, markers: List[Tuple[int, int]], pos: int) -> int:
+        """Return the page number whose marker occurs at or before pos in the full text."""
+        last = 0
+        for mpos, p in markers:
+            if mpos <= pos:
+                last = p
             else:
-                end_pos = len(text)
-                
-            # Extract section text
-            section_text = text[start_pos:end_pos]
-            sections.append(section_text)
-            
-        return sections
+                break
+        return last
     
     def create_chunks(self, text: str) -> List[LegalChunk]:
         """
-        Create semantic chunks from document text following the chunking strategy
-        
-        Args:
-            text: Full document text
-            
-        Returns:
-            List of LegalChunk objects
+        Create semantic chunks from document text and compute accurate page ranges
+        by mapping chunk positions back to the global [Page X] markers.
         """
-        # Step 1: Split by major sections
-        sections = self.split_by_section(text)
+        # Precompute page marker positions in the full text
+        page_markers = [(m.start(), int(m.group(1))) for m in self.page_pattern.finditer(text)]
         
-        # Step 2: Process each section into chunks
-        chunks = []
+        # Find section headers in the full text
+        section_matches = list(self.section_pattern.finditer(text))
+        if not section_matches:
+            # Single-section fallback
+            section_bounds = [(0, len(text), "", "")]
+        else:
+            section_bounds = []
+            for i, match in enumerate(section_matches):
+                start_pos = match.start()
+                end_pos = section_matches[i + 1].start() if i < len(section_matches) - 1 else len(text)
+                section_code, section_title = match.group(1), match.group(2)
+                section_bounds.append((start_pos, end_pos, section_code, section_title))
+        
+        chunks: List[LegalChunk] = []
         chunk_index = 0
         
-        for section_text in sections:
-            # Extract section code and title
-            section_code, section_title = self.extract_section_code(section_text)
-            
-            # Skip empty sections
+        for sec_start, sec_end, section_code, section_title in section_bounds:
+            section_text = text[sec_start:sec_end]
             if not section_text.strip():
                 continue
-                
-            # Determine if this is a major section (A-F) or subsection
-            is_major_section = len(section_code) <= 3  # e.g., "A", "A.1"
+            is_major_section = len(section_code) <= 3 if section_code else False
             
-            # For major sections, we might want to split further by subsections
+            # Helper: create chunk and set accurate pages using global markers
+            search_cursor = sec_start  # where to start searching this chunk text in full text
+            def add_chunk_from_text(chunk_text: str, code: str, title: str, has_table: bool = False):
+                nonlocal chunk_index, search_cursor
+                if not chunk_text or not chunk_text.strip():
+                    return
+                # Find the chunk's absolute start by searching forward from cursor within the section
+                rel = section_text.find(chunk_text, search_cursor - sec_start)
+                if rel == -1:
+                    # Fallback: global search from cursor
+                    abs_start = text.find(chunk_text, search_cursor, sec_end)
+                    if abs_start == -1:
+                        abs_start = sec_start  # worst-case fallback
+                else:
+                    abs_start = sec_start + rel
+                abs_end = abs_start + len(chunk_text)
+                start_page = self._last_page_before(page_markers, abs_start)
+                end_page = self._last_page_before(page_markers, abs_end)
+                # Build chunk with computed page numbers
+                ch = self.create_chunk_from_text(
+                    chunk_text, 
+                    section_code=code, 
+                    section_title=title, 
+                    page_start=start_page, 
+                    page_end=max(start_page, end_page)
+                )
+                if has_table:
+                    ch.has_table = True
+                ch.chunk_index = chunk_index
+                chunks.append(ch)
+                chunk_index += 1
+                search_cursor = abs_end
+            
+            # Optionally split major sections into subsections
             if is_major_section and len(section_text) > 1000:
-                subsections = self.split_by_section(section_text)
-                
-                # If we found subsections, process each separately
-                if len(subsections) > 1:
-                    for subsection in subsections:
-                        sub_code, sub_title = self.extract_section_code(subsection)
-                        
-                        # Create chunk for subsection
-                        chunk = self.create_chunk_from_text(
-                            subsection, 
-                            section_code=sub_code or section_code,
-                            section_title=sub_title or section_title
-                        )
-                        chunk.chunk_index = chunk_index
-                        chunks.append(chunk)
-                        chunk_index += 1
-                    
-                    continue  # Skip the rest of this iteration
+                subsecs = self.split_by_section(section_text)
+                if len(subsecs) > 1:
+                    for sub in subsecs:
+                        sub_code, sub_title = self.extract_section_code(sub)
+                        add_chunk_from_text(sub, sub_code or section_code, sub_title or section_title)
+                    continue
             
-            # Handle tables specially - they should be kept intact
+            # Handle tables specially
             table_regions = self.identify_tables(section_text)
             if table_regions:
-                # Process non-table content first
-                current_pos = 0
+                lines = section_text.split('\n')
+                current_line = 0
                 for table_start, table_end in table_regions:
-                    # Text before table
-                    if table_start > current_pos:
-                        pre_table_text = '\n'.join(section_text.split('\n')[current_pos:table_start])
-                        if pre_table_text.strip():
-                            chunk = self.create_chunk_from_text(
-                                pre_table_text,
-                                section_code=section_code,
-                                section_title=section_title
-                            )
-                            chunk.chunk_index = chunk_index
-                            chunks.append(chunk)
-                            chunk_index += 1
-                    
-                    # Table content
-                    table_text = '\n'.join(section_text.split('\n')[table_start:table_end])
-                    if table_text.strip():
-                        chunk = self.create_chunk_from_text(
-                            table_text,
-                            section_code=section_code,
-                            section_title=section_title
-                        )
-                        chunk.has_table = True
-                        chunk.chunk_index = chunk_index
-                        chunks.append(chunk)
-                        chunk_index += 1
-                    
-                    current_pos = table_end
-                
-                # Text after last table
-                if current_pos < len(section_text.split('\n')):
-                    post_table_text = '\n'.join(section_text.split('\n')[current_pos:])
-                    if post_table_text.strip():
-                        chunk = self.create_chunk_from_text(
-                            post_table_text,
-                            section_code=section_code,
-                            section_title=section_title
-                        )
-                        chunk.chunk_index = chunk_index
-                        chunks.append(chunk)
-                        chunk_index += 1
+                    # Pre-table
+                    if table_start > current_line:
+                        pre_text = '\n'.join(lines[current_line:table_start])
+                        add_chunk_from_text(pre_text, section_code, section_title)
+                    # Table
+                    table_text = '\n'.join(lines[table_start:table_end])
+                    add_chunk_from_text(table_text, section_code, section_title, has_table=True)
+                    current_line = table_end
+                # Post-table
+                if current_line < len(lines):
+                    post_text = '\n'.join(lines[current_line:])
+                    add_chunk_from_text(post_text, section_code, section_title)
             else:
-                # No tables, create chunk for whole section
+                # Size-driven split by paragraphs
                 token_count = self.count_tokens(section_text)
-                
-                # If section is too large, split by paragraphs
                 if token_count > self.max_chunk_size:
-                    # Split by paragraphs (double newlines)
                     paragraphs = re.split(r'\n\s*\n', section_text)
-                    
                     current_chunk = ""
-                    current_tokens = 0
-                    
                     for para in paragraphs:
-                        para_tokens = self.count_tokens(para)
-                        
-                        # If adding this paragraph would exceed max size, create a chunk
-                        if current_tokens + para_tokens > self.max_chunk_size and current_chunk:
-                            chunk = self.create_chunk_from_text(
-                                current_chunk,
-                                section_code=section_code,
-                                section_title=section_title
-                            )
-                            chunk.chunk_index = chunk_index
-                            chunks.append(chunk)
-                            chunk_index += 1
-                            
+                        if not para.strip():
+                            continue
+                        if self.count_tokens(current_chunk + ("\n\n" if current_chunk else "") + para) > self.max_chunk_size and current_chunk:
+                            add_chunk_from_text(current_chunk, section_code, section_title)
                             current_chunk = para
-                            current_tokens = para_tokens
                         else:
-                            # Add paragraph to current chunk
-                            if current_chunk:
-                                current_chunk += "\n\n" + para
-                            else:
-                                current_chunk = para
-                            current_tokens += para_tokens
-                    
-                    # Add final chunk if there's content left
+                            current_chunk = (current_chunk + "\n\n" + para) if current_chunk else para
                     if current_chunk:
-                        chunk = self.create_chunk_from_text(
-                            current_chunk,
-                            section_code=section_code,
-                            section_title=section_title
-                        )
-                        chunk.chunk_index = chunk_index
-                        chunks.append(chunk)
-                        chunk_index += 1
+                        add_chunk_from_text(current_chunk, section_code, section_title)
                 else:
-                    # Section is small enough for one chunk
-                    chunk = self.create_chunk_from_text(
-                        section_text,
-                        section_code=section_code,
-                        section_title=section_title
-                    )
-                    chunk.chunk_index = chunk_index
-                    chunks.append(chunk)
-                    chunk_index += 1
+                    add_chunk_from_text(section_text, section_code, section_title)
         
         return chunks
     
-    def create_chunk_from_text(self, text: str, section_code: str = "", section_title: str = "") -> LegalChunk:
-        """
-        Create a LegalChunk object from text with metadata
+    def create_chunk_from_text(self, text: str, section_code: str = "", section_title: str = "", page_start: int = 0, page_end: int = 0) -> LegalChunk:
+        """Create a LegalChunk object from text with metadata"""
+        # Use provided page numbers if available, otherwise try to extract from text
+        if page_start == 0 and page_end == 0:
+            page_start, page_end = self.extract_page_numbers(text)
         
-        Args:
-            text: Chunk text
-            section_code: Section code (e.g., "A.1")
-            section_title: Section title
-            
-        Returns:
-            LegalChunk object
-        """
-        # Extract page numbers
-        page_start, page_end = self.extract_page_numbers(text)
-        
-        # Detect content type
         content_type = self.detect_content_type(text)
-        
-        # Extract topic tags
         topic_tags = self.extract_topic_tags(text)
-        
-        # Count tokens
         token_count = self.count_tokens(text)
-        
-        # Create chunk
         chunk = LegalChunk(
             content=text,
             section_code=section_code,
@@ -550,8 +403,7 @@ class LegalDocumentChunker:
             icd_codes=content_type.get('icd_codes', []),
             eligibility=content_type.get('eligibility', False),
             limitations=content_type.get('limitations', False),
-            effective_date="2024-01-01",  # Hardcoded from prompt
+            effective_date="2024-01-01",
             token_count=token_count
         )
-        
         return chunk

@@ -25,6 +25,9 @@ export const parseAnswer = (data = {}) => {
     sources.push({
       document: document || null,
       section_title,
+      page_start: src.page_start,
+      page_end: src.page_end,
+      link: src.link,
     });
   }
 

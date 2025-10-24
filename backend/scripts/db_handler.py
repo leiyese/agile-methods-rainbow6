@@ -31,6 +31,47 @@ except ImportError:
     HAS_DATABASE = False
 
 
+def load_external_metadata(pdf_path: str) -> Dict[str, Any]:
+    """
+    Load external metadata from a JSON file alongside the PDF.
+    
+    Looks for a JSON file with the same name as the PDF but with .json extension.
+    For example: document.pdf -> document.json
+    
+    Expected JSON structure:
+    {
+        "title": "Document Title",
+        "source_url": "https://example.com/document.pdf",
+        "author": "Author Name",
+        "description": "Document description",
+        "category": "insurance",
+        "language": "sv"
+    }
+    
+    Args:
+        pdf_path: Path to the PDF file
+        
+    Returns:
+        Dictionary with external metadata, or empty dict if no file found
+    """
+    # Generate metadata file path
+    base_path = os.path.splitext(pdf_path)[0]
+    metadata_path = base_path + ".json"
+    
+    if not os.path.exists(metadata_path):
+        print(f"ℹ️  No external metadata file found at {metadata_path}")
+        return {}
+    
+    try:
+        with open(metadata_path, 'r', encoding='utf-8') as f:
+            metadata = json.load(f)
+        print(f"✓ Loaded external metadata from {metadata_path}")
+        return metadata
+    except Exception as e:
+        print(f"⚠️  Warning: Could not load metadata from {metadata_path}: {e}")
+        return {}
+
+
 def update_document_metadata(document_id, metadata):
     """
     Update document metadata in the database
@@ -102,14 +143,20 @@ def save_chunks(pdf_path: str, chunks: List[Any], use_local: bool = False) -> in
         if page_count == 0:
             page_count = 1  # Default if no page numbers found
 
-        # Extract metadata from first chunk
-        metadata = {
+        # Load external metadata and merge with extracted metadata
+        external_metadata = load_external_metadata(pdf_path)
+        
+        # Extract metadata from chunks
+        extracted_metadata = {
             "effective_date": chunks[0].effective_date if chunks else "",
             "section_count": len(
                 set(chunk.section_code for chunk in chunks if chunk.section_code)
             ),
             "chunk_count": len(chunks),
         }
+        
+        # Merge external metadata with extracted metadata (external takes precedence for duplicates)
+        metadata = {**extracted_metadata, **external_metadata}
 
         document_id = insert_document(
             filename=filename,

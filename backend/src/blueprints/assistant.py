@@ -71,16 +71,16 @@ def answer():
             # Read threshold/count from env or Flask config, with safe fallbacks
             try:
                 match_threshold = float(
-                    os.getenv("MATCH_THRESHOLD", current_app.config.get("MATCH_THRESHOLD", 0.5))
+                    os.getenv("MATCH_THRESHOLD", current_app.config.get("MATCH_THRESHOLD", 0.45))
                 )
             except Exception:
-                match_threshold = 0.5
+                match_threshold = 0.45
             try:
                 match_count = int(
-                    os.getenv("MATCH_COUNT", current_app.config.get("MATCH_COUNT", 5))
+                    os.getenv("MATCH_COUNT", current_app.config.get("MATCH_COUNT", 8))
                 )
             except Exception:
-                match_count = 5
+                match_count = 8
 
             logger.info(
                 f"Searching for similar chunks with threshold={match_threshold}, count={match_count}"
@@ -233,30 +233,58 @@ def answer():
             # Format retrieved chunks as context
             context_parts = []
             for i, chunk in enumerate(similar_chunks, 1):
-                doc_name = chunk.get("filename") or f"Dokument {i}"
-                section = chunk.get("section") or chunk.get("section_title") or "Okänt avsnitt"
-                page_number = chunk.get("page_number") or "Okänd sida"
+                # Use title if available, otherwise fall back to filename
+                doc_name = chunk.get("title") or chunk.get("filename") or f"Dokument {i}"
+                
+                # Use section_code and section_title from metadata
+                section_code = chunk.get("section_code", "")
+                section_title = chunk.get("section_title", "")
+                if section_code and section_title:
+                    section = f"{section_code} {section_title}"
+                elif section_title:
+                    section = section_title
+                elif section_code:
+                    section = section_code
+                else:
+                    section = "Okänt avsnitt"
+                
+                # Use page_start/page_end from metadata if available
+                page_start = chunk.get("page_start")
+                page_end = chunk.get("page_end")
+                if page_start and page_start > 0:
+                    if page_end and page_end != page_start:
+                        page_info = f"{page_start}-{page_end}"
+                    else:
+                        page_info = str(page_start)
+                else:
+                    page_info = "Okänd sida"
+                
+                # Use effective_date from document metadata
                 date = chunk.get("date") or "Okänt datum"
                 link = chunk.get("link")
 
-                # Chunks without page numbers for now
-                label = f"{doc_name} (Avsnitt: {section}, Sida: {page_number}, Datum: {date})"
+                # Create improved label with better metadata
+                label = f"{doc_name} (Avsnitt: {section}, Sida: {page_info}, Datum: {date})"
                 if link:
                     label = f"[{label}]({link})"
 
-                # Remove page number from label since we don´t have that working yet in the ingestion process
                 context_parts.append(f"{label}\n{chunk.get('content', '')}")
             context = "\n\n".join(context_parts)
 
             # Build RAG prompt
             rag_prompt = (
-                "Du är en assistent för länsförsäkringar. Svara på frågor om försäkringar.DU är skapad av Svara alltid på svenska. Svara inte med markdown. Var alltid trevlig och svara på max 3000 tokens. Säg jag vet inte om du inte vet\n"
-                "När du svarar, ange alltid vilket dokument och avsnitt (om tillgängligt) som stöder ditt svar.\n"
-                "Context information:\n"
+                "Du är en försäkringsassistent för Länsförsäkringar. Svara alltid på svenska och var hjälpsam.\n"
+                "\n"
+                "Analysera den tillhandahållna kontextinformationen noggrant för att svara på frågan. "
+                "Leta specifikt efter direkta definitioner och listor över vad som räknas som olycksfallsskada. "
+                "Om dokumentet explicit anger att något räknas som eller inte räknas som en olycksfallsskada, "
+                "använd denna direkta information för att svara. "
+                "Ange alltid vilken källa (dokument/avsnitt) som stöder ditt svar.\n"
+                "\n"
+                "Kontextinformation:\n"
                 f"{context}\n\n"
-                "Based on the context information provided above, please answer the following question:\n"
-                f"{question}\n\n"
-                "If the answer cannot be found in the context, please say so."
+                f"Fråga: {question}\n\n"
+                "Svar:"
             )
 
             # Log the RAG prompt
@@ -298,8 +326,11 @@ def answer():
                         "trace_id": trace_id,
                         "sources": [
                             {
-                                "document": chunk.get("filename", f"Dokument {i+1}"),
-                                "section": chunk.get("section") or chunk.get("section_title") or None,
+                                "document": chunk.get("title") or chunk.get("filename", f"Dokument {i+1}"),
+                                "section": chunk.get("section_code") or chunk.get("section_title") or None,
+                                "section_title": chunk.get("section_title") or None,
+                                "page_start": chunk.get("page_start"),
+                                "page_end": chunk.get("page_end"),
                                 "link": chunk.get("link"),
                                 "excerpt": chunk.get("content", "")[:150] + "..."
                             }
