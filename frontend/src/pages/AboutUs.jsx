@@ -7,22 +7,34 @@ import './AboutUs.css';
 
 const TEAM_MEMBERS = [
   {
-    name: 'Alex Doe',
-    role: 'AI Developer-student',
-    email: 'alex@example.com',
-    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/v1730200000/team-member-1.png',
+    name: 'Alice Rydén',
+    linkedinUrl: 'https://www.linkedin.com/in/alice-ryd%C3%A9n-ba745b228/',
+    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1761738498/alice_rrnidt.png',
   },
   {
-    name: 'Blake Kim',
-    role: 'AI Developer-student',
-    email: 'blake@example.com',
-    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/v1730200000/team-member-2.png',
+    name: 'Daniel Salin',
+    linkedinUrl: 'https://www.linkedin.com/in/daniel-salin-57084535/',
+    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1761738498/daniel_dixakb.png',
   },
   {
-    name: 'Casey Lee',
-    role: 'AI Developer-student',
-    email: 'casey@example.com',
-    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/v1730200000/team-member-3.png',
+    name: 'Lei Ye',
+    linkedinUrl: 'https://www.linkedin.com/in/leiye1989/',
+    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1761738879/lei_v2_eyf7fl.png',
+  },
+  {
+    name: 'Piroz Kianersi',
+    linkedinUrl: 'https://www.linkedin.com/in/piroz-kianersi/',
+    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1761738498/piroz_awtgcn.png',
+  },
+  {
+    name: 'Sabrina Rybak',
+    linkedinUrl: 'https://www.linkedin.com/in/sabrinarybak/',
+    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1761738879/sabrina_v2_h6v0fu.png',
+  },
+  {
+    name: 'Xiaohua Zhu',
+    linkedinUrl: 'https://www.linkedin.com/in/xiaohua-zhu-561906230/',
+    imageUrl: 'https://res.cloudinary.com/dh4nepzch/image/upload/w_1000,ar_1:1,c_fill,g_auto,e_art:hokusai/v1761738880/xiahua_v2_weatjn.png',
   },
 ];
 
@@ -38,16 +50,16 @@ export default function AboutUs() {
 
       <section className="about-content">
         <p>
-          Denna sida är skapad av en grupp engagerade studenter från AI Developer-programmet vid Jensen Yrkeshögskola. Det du ser här är resultatet av vårt gemensamma grupparbete i kursen Agilmetodik.
+          Denna sida är skapad av en grupp engagerade studenter från AI Developer-programmet vid Jensen Yrkeshögskola. Det du ser här är resultatet av vårt gemensamma grupparbete i kursen Agil utveckling.
         </p>
         <p>
-          Under kursens gång har vi fått möjlighet att praktisera Agilmetodik i verkligheten — genom att planera, samarbeta, anpassa oss och utvecklas tillsammans. Vårt mål har varit att skapa en funktionell och användarvänlig lösning, men också att lära oss hur samarbete, kommunikation och kreativ problemlösning kan driva ett projekt framåt.
+          Under kursens gång har vi fått möjlighet att praktisera agil metodik i verkligheten genom att planera, samarbeta, anpassa oss och utvecklas tillsammans. Vårt mål har varit att skapa en funktionell och användarvänlig lösning, men också att lära oss hur samarbete, kommunikation och kreativ problemlösning kan driva ett projekt framåt.
         </p>
         <p>
           Det här projektet är mer än bara kod och design. Det är ett resultat av kamratskap, brainstorming, feedback och lärande i lag. Vi hoppas att du tycker om att utforska sidan lika mycket som vi har tyckt om att skapa den.
         </p>
         <p className="about-highlight">
-          Vill du komma i kontakt med någon av oss? Klicka på våra bilder längst ned på sidan.
+          Vill du komma i kontakt med någon av oss? Klicka på våra bilder längst ned på sidan för att besöka våra LinkedIn profiler.
         </p>
       </section>
 
@@ -56,18 +68,22 @@ export default function AboutUs() {
         <div className="team-grid">
           {TEAM_MEMBERS.map((member) => (
             <a
-              key={member.email}
+              key={member.linkedinUrl}
               className="team-card"
-              href={`mailto:${member.email}`}
-              aria-label={`Kontakta ${member.name}`}
+              href={member.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`LinkedIn profil för ${member.name} - öppnas i nytt fönster`}
             >
               <div className="team-image-wrapper">
-                <img src={member.imageUrl} alt={member.name} loading="lazy" />
+                <img 
+                  src={member.imageUrl} 
+                  alt={`Profilbild av ${member.name}, AI Developer-student`} 
+                  loading="lazy" 
+                />
               </div>
               <div className="team-info">
                 <p className="team-name">{member.name}</p>
-                <p className="team-role">{member.role}</p>
-                <span className="team-contact">Klicka för kontakt</span>
               </div>
             </a>
           ))}
