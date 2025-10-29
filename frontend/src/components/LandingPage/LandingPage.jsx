@@ -56,6 +56,13 @@ export default function LandingPage() {
           </div>
         ))}
       </div>
+
+      {/* About Us Button */}
+      <div className="about-button-section">
+        <Button onClick={() => navigate('/about')}>
+          Om oss
+        </Button>
+      </div>
       
       <Footer />
     </div>

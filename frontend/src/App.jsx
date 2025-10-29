@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ChatPage from './pages/ChatPage'
 import LandingPage from './components/LandingPage/LandingPage'
+import AboutUs from './pages/AboutUs'
 import './App.css'
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/app" element={<ChatPage />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
