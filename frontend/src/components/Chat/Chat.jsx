@@ -171,7 +171,13 @@ export default function Chat() {
                                   <div className="source-title">
                                     {src.link ? (
                                       <a
-                                        href={src.link}
+                                        href={(() => {
+                                          let url = src.link;
+                                          if (src.page_start && src.page_start > 0 && url.toLowerCase().includes('.pdf')) {
+                                            url += `#page=${src.page_start}`;
+                                          }
+                                          return url;
+                                        })()}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="source-link"
