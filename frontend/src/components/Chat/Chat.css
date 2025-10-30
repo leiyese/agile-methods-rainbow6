@@ -251,7 +251,7 @@
   background: #a8a8a8;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .chat-container {
     width: 100%;
     max-width: 100%;
@@ -400,12 +400,6 @@
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .chat-container {
-    width: clamp(520px, 60vw, 700px);
-    height: min(75vh, 650px);
-  }
-}
 
 @media (min-width: 1025px) {
   .chat-container {
@@ -473,8 +467,8 @@
   border: 1px solid #a8bfe8;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: 400px;
-  max-width: calc(100vw - 40px);
+  width: 100%;
+  max-width: 400px;
   max-height: 210px;
   z-index: 100;
   animation: bubbleSlideDown 0.25s ease-out;
@@ -605,13 +599,20 @@
 }
 
 .external-link-icon {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  font-size: 1rem;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: rgba(0, 102, 204, 0.1);
+  border: 1px solid rgba(0, 102, 204, 0.2);
 }
 
 .source-link:hover .external-link-icon {
   opacity: 1;
+  background: rgba(0, 102, 204, 0.15);
+  border-color: rgba(0, 102, 204, 0.3);
+  transform: translateY(-1px);
 }
 
 .excerpt {
@@ -670,7 +671,6 @@
 /* Mobile responsive */
 @media (max-width: 768px) {
   .sources-bubble {
-    width: calc(100vw - 60px);
     max-height: 300px;
     font-size: 0.9rem;
   }
@@ -707,7 +707,7 @@
   }
   
   .external-link-icon {
-    font-size: 0.75rem;
+    font-size: 0.9rem;
   }
 
   .excerpt {
