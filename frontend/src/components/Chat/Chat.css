@@ -255,7 +255,7 @@
   .chat-container {
     width: 100%;
     max-width: 100%;
-    height: calc(100vh - 5rem); /* Account for footer height */
+    height: calc(100vh - 6rem); /* Account for footer height */
     min-width: 100%;
     border-radius: 0;
     border: none;
@@ -326,7 +326,7 @@
 @media (max-width: 480px) {
   .chat-container {
     width: 100%;
-    height: calc(100vh - 4rem); /* Account for footer height on small mobile */
+    height: calc(100vh - 5rem); /* Account for footer height on small mobile */
     border-radius: 0;
   }
 
