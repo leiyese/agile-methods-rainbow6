@@ -150,6 +150,13 @@
   margin-bottom: 3rem;
 }
 
+/* About Button Section */
+.about-button-section {
+  animation: fadeInUp 1s ease-out;
+  margin-bottom: 3rem;
+  margin-top: 0.5rem;
+}
+
 /* CTA button styles now in Button.css */
 
 /* Animations */
