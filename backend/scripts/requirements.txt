@@ -1,7 +1,0 @@
-PyPDF2>=3.0.0
-tiktoken>=0.5.0
-spacy>=3.6.0
-langchain>=0.0.267
-numpy>=1.24.0
-google-generativeai>=0.3.0
-sentence-transformers>=2.2.2
