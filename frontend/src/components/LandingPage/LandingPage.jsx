@@ -48,23 +48,16 @@ export default function LandingPage() {
 
       {/* Features Section */}
       <div className="features-section">
-        {features.map((feature) => (
-          <div key={feature.title} className="feature-card">
-            <div className="feature-icon">{feature.icon}</div>
-            <h3>{feature.title}</h3>
-            <p>{feature.description}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* About Us Button */}
-      <div className="about-button-section">
-        <Button onClick={() => navigate('/about')}>
-          Om oss
-        </Button>
-      </div>
-      
-      <Footer />
+      {features.map((feature) => (
+        <div key={feature.title} className="feature-card">
+          <div className="feature-icon">{feature.icon}</div>
+          <h3>{feature.title}</h3>
+          <p>{feature.description}</p>
+        </div>
+      ))}
+    </div>
+    
+    <Footer />
     </div>
   );
 }

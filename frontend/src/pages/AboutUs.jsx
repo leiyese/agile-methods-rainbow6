@@ -94,6 +94,9 @@ export default function AboutUs() {
         <Button onClick={() => navigate('/')}>
           Tillbaka
         </Button>
+        <Button onClick={() => navigate('/app')}>
+          Till Chatbotten
+        </Button>
       </div>
 
       <Footer />
