@@ -19,7 +19,6 @@ def answer():
         return jsonify({"error": "BadRequest", "message": "Invalid JSON"}), 400
 
     question = data.get("question")
-    use_mock = bool(data.get("use_mock", False))
 
     if not question:
         return (
@@ -29,22 +28,6 @@ def answer():
 
     t0 = time.time()
     trace_id = str(uuid.uuid4())
-
-    if use_mock:
-        copy = current_app.config.get("COPY") or {}
-        ans = next((v for k, v in copy.items() if k.lower() in question.lower()), None)
-        ans = ans or "Svar på frågan."
-        return (
-            jsonify(
-                {
-                    "answer": ans,
-                    "model_used": "mock",
-                    "latency_ms": int((time.time() - t0) * 1000),
-                    "trace_id": trace_id,
-                }
-            ),
-            200,
-        )
 
     try:
         llm = current_app.config.get("LLM")
@@ -271,7 +254,6 @@ def answer():
                 context_parts.append(f"{label}\n{chunk.get('content', '')}")
             context = "\n\n".join(context_parts)
 
-            # Build RAG prompt
             rag_prompt = (
                 "Du är en försäkringsassistent för Länsförsäkringar. Svara alltid på svenska och var hjälpsam.\n"
                 "\n"
@@ -279,7 +261,24 @@ def answer():
                 "Leta specifikt efter direkta definitioner och listor över vad som räknas som olycksfallsskada. "
                 "Om dokumentet explicit anger att något räknas som eller inte räknas som en olycksfallsskada, "
                 "använd denna direkta information för att svara. "
-                "Ange alltid vilken källa (dokument/avsnitt) som stöder ditt svar.\n"
+                "\n\n"
+                "VIKTIGT: Börja alltid ditt svar med antingen '[SÄKER]' eller '[OSÄKER]' - använd denna markering endast EN GÅNG i början av svaret.\n"
+                "\n"
+                "FÖR '[SÄKER]' SVAR:\n"
+                "- Använd när du kan ge ett definitivt ja/nej-svar eller specifik förklaring\n"
+                "- Inkludera källhänvisningar med dokumentnamn, avsnitt och sidnummer\n"
+                "\n"
+                "FÖR '[OSÄKER]' SVAR:\n"
+                "- Använd när informationen är otillräcklig för ett säkert svar\n"
+                "- Skriv ENDAST en kort förklaring utan några dokumentreferenser\n"
+                "- Avsluta med att rekommendera kontakt med Länsförsäkringar\n"
+                "- EXEMPEL: 'Jag kan inte avgöra detta baserat på tillgänglig information. Kontakta Länsförsäkringar för en bedömning av ditt fall.'\n"
+                "\n"
+                "FORMATERING: När du refererar till källor i ditt svar:\n"
+                "- Använd citattecken endast för korta, exakta citat\n"
+                "- För längre avsnitt eller listor, parafrasera och referera med (Dokumentnamn, Avsnitt X.X, Sida Y)\n"
+                "- Inkludera alltid det fullständiga dokumentnamnet i källhänvisningar\n"
+                "- Behåll viktiga listor och punkter i läsbar form\n"
                 "\n"
                 "Kontextinformation:\n"
                 f"{context}\n\n"
@@ -295,7 +294,7 @@ def answer():
             logger.info("Generating answer using RAG prompt")
             answer = llm.generate(
                 prompt=rag_prompt,
-                max_tokens=4000,
+                max_tokens=6000,  # Increased token limit to avoid cutoffs
                 temperature=0.3,  # Lower temperature for factual answers
             )
 
@@ -303,16 +302,26 @@ def answer():
             logger.info(f"Answer generated, length: {len(answer)} characters")
             logger.info(f"Answer preview: {answer[:100]}...")
 
-            # Check if LLM says it doesn't know
-            answer_lower = answer.lower()
-            knows_answer = not any(phrase in answer_lower for phrase in [
-                "jag vet inte",
-                "vet inte",
-                "kan inte svara",
-                "hittar inte",
-                "finns inte",
-                "inte tillräcklig information"
-            ])
+            # Check confidence indicator from LLM response
+            answer_stripped = answer.strip()
+            
+            # Check for confidence indicators and remove ALL occurrences
+            if '[SÄKER]' in answer_stripped:
+                knows_answer = True
+                # Remove ALL occurrences of the confidence indicator
+                answer = answer_stripped.replace('[SÄKER]', '').strip()
+                logger.info("LLM marked answer as CONFIDENT - sources will be shown")
+            elif '[OSÄKER]' in answer_stripped:
+                knows_answer = False
+                # Remove ALL occurrences of the confidence indicator
+                answer = answer_stripped.replace('[OSÄKER]', '').strip()
+                logger.info("LLM marked answer as UNCERTAIN - sources will be hidden")
+            else:
+                # Fallback: if no indicator is present, use conservative approach
+                knows_answer = False
+                logger.warning("No confidence indicator found in LLM response - defaulting to no sources")
+            
+            logger.info(f"Source decision: knows_answer={knows_answer}, will return {len(similar_chunks) if knows_answer else 0} sources")
             
             # Return RAG-enhanced response
             return (

@@ -68,16 +68,6 @@ def create_app():
     else:
         cors.init_app(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
-    try:
-        copy_path = os.path.join(
-            os.path.dirname(os.path.dirname(__file__)), "copy.json"
-        )
-        with open(copy_path, "r", encoding="utf-8") as f:
-            app.config["COPY"] = json.load(f)
-    except FileNotFoundError:
-        app.config["COPY"] = {}
-    except json.JSONDecodeError:
-        app.config["COPY"] = {}
 
     app.register_blueprint(main_bp)
     app.register_blueprint(assistant_bp)
