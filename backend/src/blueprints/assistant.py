@@ -19,7 +19,6 @@ def answer():
         return jsonify({"error": "BadRequest", "message": "Invalid JSON"}), 400
 
     question = data.get("question")
-    use_mock = bool(data.get("use_mock", False))
 
     if not question:
         return (
@@ -29,22 +28,6 @@ def answer():
 
     t0 = time.time()
     trace_id = str(uuid.uuid4())
-
-    if use_mock:
-        copy = current_app.config.get("COPY") or {}
-        ans = next((v for k, v in copy.items() if k.lower() in question.lower()), None)
-        ans = ans or "Svar på frågan."
-        return (
-            jsonify(
-                {
-                    "answer": ans,
-                    "model_used": "mock",
-                    "latency_ms": int((time.time() - t0) * 1000),
-                    "trace_id": trace_id,
-                }
-            ),
-            200,
-        )
 
     try:
         llm = current_app.config.get("LLM")
