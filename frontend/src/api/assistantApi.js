@@ -1,10 +1,9 @@
 import apiClient from './client.js';
 
-export const askAssistant = async (question, useMock = true) => {
+export const askAssistant = async (question) => {
   try {
     const response = await apiClient.post('/answer', {
-      question: question,
-      use_mock: useMock
+      question: question
     });
     
     return {

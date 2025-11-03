@@ -69,7 +69,7 @@ export default function Chat() {
     setIsLoading(true);
 
     try {
-      const result = await askAssistant(message, false);
+      const result = await askAssistant(message);
 
       if (result.success) {
         const parsed = parseAnswer(result.data || result);
