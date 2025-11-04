@@ -10,12 +10,9 @@ psycopg2-binary
 pgvector
 
 # --- Data / ML ---
-numpy
-scikit-learn
-scipy
-sentence-transformers
-tiktoken
-spacy>=3.6.0
+numpy  # Required by pgvector
+tiktoken  # Token counting for chunking
+spacy>=3.6.0  # NLP for document chunking (ingestion only)
 
 # --- LangChain (no Google adapter to avoid conflicts) ---
 langchain
